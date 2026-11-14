@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HONEY TALLY V36 - Camera + Gallery Smart Entry</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#172033;--muted:#667085;--brand:#5b3cc4;--brand2:#7c5ce7;--line:#e7e9f0;--good:#087443;--bad:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,Arial}
+header{background:linear-gradient(120deg,#352078,#7355d8);color:white;padding:18px 16px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:21px;letter-spacing:1px}header small{opacity:.85}
+nav{display:flex;gap:7px;overflow:auto;padding:10px;background:#fff;position:sticky;top:68px;z-index:4;border-bottom:1px solid var(--line)}
+nav button{white-space:nowrap;border:0;background:#eeeafc;color:#49339a;padding:9px 12px;border-radius:20px;font-weight:650}
+nav button.active{background:var(--brand);color:white}
+main{max-width:900px;margin:auto;padding:14px}.page{display:none}.page.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:15px;margin:0 0 13px;box-shadow:0 3px 12px #17203308}
+h2{font-size:19px;margin:0 0 12px}h3{font-size:16px;margin:0 0 8px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{background:#f7f5ff;border-radius:12px;padding:13px}.stat b{display:block;font-size:21px;color:#4c32a0;margin-top:4px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d8dbe5;border-radius:10px;background:#fff;font:inherit;color:var(--ink)}
+textarea{min-height:70px;resize:vertical}
+button.primary{border:0;background:var(--brand);color:#fff;padding:11px 15px;border-radius:10px;font-weight:700;margin-top:12px}
+button.secondary{border:1px solid #d9d3f3;background:#f5f2ff;color:#49339a;padding:9px 12px;border-radius:9px;font-weight:650}
+button.danger{border:1px solid #f3c6c2;background:#fff4f2;color:var(--bad);padding:8px 10px;border-radius:8px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}
+.muted{color:var(--muted);font-size:13px}.notice{background:#fff8e7;border:1px solid #f3dfab;padding:11px;border-radius:10px;font-size:13px;margin:8px 0}
+.good{color:var(--good)}.bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:650}
+.tablewrap{overflow:auto}
+.pill{display:inline-block;padding:3px 8px;background:#eeeafc;color:#49339a;border-radius:20px;font-size:12px}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+#splash{position:fixed;inset:0;background:#fff;z-index:20;display:flex;align-items:center;justify-content:center;text-align:center}
+.logo{width:82px;height:82px;background:#5b3cc4;color:white;border-radius:22px;display:grid;place-items:center;font-size:30px;font-weight:900;margin:0 auto 12px;box-shadow:0 10px 28px #5b3cc455}
+.hidden{display:none!important}
+@media(max-width:520px){.grid{grid-template-columns:1fr 1fr}main{padding:10px}.card{padding:13px}}
+/* Classic Tally-style Gateway start screen */
+body.gateway-mode{background:#e1f2fb;color:#172b43;font-family:Arial, sans-serif}
+body.gateway-mode header{background:#2864a8;padding:10px 16px;position:relative;top:auto;text-align:center}
+body.gateway-mode header .row{justify-content:center}
+body.gateway-mode header .row>div:first-child{flex:1!important}
+body.gateway-mode header .row>div:last-child{display:none}
+body.gateway-mode header h1{font-size:20px;letter-spacing:0}
+body.gateway-mode header small{display:none}
+body.gateway-mode nav{display:none}
+body.gateway-mode #backBar{display:none}
+#backBar{max-width:900px;margin:10px auto 0;padding:0 14px}
+#backBar button{display:inline-flex;align-items:center;gap:8px;border:1px solid #b9cce0;background:#edf6fc;color:#245b91;border-radius:8px;padding:9px 14px;font-weight:700;font-size:14px;cursor:pointer}
+#backBar button:active{background:#ffcc32;color:#332900}
+body.gateway-mode main{max-width:none;padding:0;min-height:calc(100vh - 52px)}
+body.gateway-mode #home{min-height:calc(100vh - 52px);background:#e1f2fb;border:1px solid #9fc8df;box-shadow:inset 0 0 0 1px #f7fcff;padding:30px 0 45px}
+.gateway-title{display:none}
+.gateway-layout{width:min(100%,900px);margin:0 auto;min-height:calc(100vh - 135px);display:flex;justify-content:center;align-items:flex-start}
+.gateway-menu{width:min(100%,650px);padding:10px 0 24px}
+.gateway-company{font-size:13px;color:#507a9d;text-align:center;margin:0 0 22px;min-height:18px}
+.gateway-group{font-size:14px;color:#789bb6;font-weight:700;margin:18px 0 8px 18px;letter-spacing:.3px}
+.gateway-item{display:block;width:100%;border:0;border-radius:0;text-align:left;background:transparent;color:#172b43;font:20px Arial,sans-serif;padding:5px 18px;margin:0;cursor:pointer}
+.gateway-item:hover,.gateway-item.selected{background:#ffcc32;color:#332900}
+.gateway-item.selected{font-weight:700}
+.gateway-quit{margin-top:22px;color:#2864a8}
+.gateway-footer{font-size:12px;color:#7396b2;text-align:center;margin-top:18px}
+body:not(.gateway-mode) .gateway-layout{display:none}
+body:not(.gateway-mode) #home .legacy-dashboard{display:block}
+body.gateway-mode #home .legacy-dashboard{display:none}
+@media(max-width:600px){.gateway-layout{justify-content:flex-start}.gateway-menu{width:100%;padding:4px 0}.gateway-item{font-size:19px;padding:7px 18px}.gateway-group{margin-top:17px}}
+
+
+/* V25: simpler, friendlier mobile-first workspace */
+:root{--bg:#f3f6fc;--card:#fff;--ink:#17233b;--muted:#64748b;--brand:#315fbd;--brand2:#4f83df;--line:#e2e8f0}
+body:not(.gateway-mode){background:#f3f6fc;font-size:15px}
+body:not(.gateway-mode) header{background:linear-gradient(120deg,#173b78,#3477ce);padding:14px 16px}
+body:not(.gateway-mode) header h1{font-size:20px}
+body:not(.gateway-mode) nav{top:64px;box-shadow:0 3px 12px #1720330b;padding:9px;gap:8px}
+body:not(.gateway-mode) nav button{border-radius:10px;background:#edf2fb;color:#284b83;padding:10px 13px}
+body:not(.gateway-mode) nav button.active{background:#315fbd;color:#fff}
+body:not(.gateway-mode) main{max-width:980px;padding:16px}
+body:not(.gateway-mode) .card{border-radius:16px;padding:18px;border-color:#e3eaf5;box-shadow:0 5px 18px #1d35570b;margin-bottom:15px}
+body:not(.gateway-mode) h2{font-size:21px;color:#18345f}
+body:not(.gateway-mode) h3{color:#244674}
+body:not(.gateway-mode) label{font-size:13px;font-weight:650;color:#405675;margin-top:13px}
+body:not(.gateway-mode) input,body:not(.gateway-mode) select,body:not(.gateway-mode) textarea{border:1px solid #cbd7e8;border-radius:11px;padding:12px;background:#fbfdff}
+body:not(.gateway-mode) input:focus,body:not(.gateway-mode) select:focus,body:not(.gateway-mode) textarea:focus{outline:3px solid #315fbd20;border-color:#4f83df}
+body:not(.gateway-mode) button.primary{background:#315fbd;border-radius:11px;padding:12px 17px}
+body:not(.gateway-mode) button.secondary{border-radius:11px;background:#eef4ff;color:#244f91;border-color:#d7e3f7}
+.help-banner{background:#edf5ff;border:1px solid #cfe1fa;border-radius:13px;padding:13px 15px;color:#294c7c;margin:10px 0 15px;font-size:14px;line-height:1.55}
+.form-section{border-top:1px solid #edf0f6;margin-top:17px;padding-top:7px}
+.form-section-title{font-size:13px;font-weight:800;letter-spacing:.4px;color:#4770aa;margin:9px 0 2px}
+.quick-chip{border:1px solid #d9e5f6;background:#f6f9ff;color:#31568c;border-radius:20px;padding:8px 11px;font-size:13px}
+@media(max-width:600px){body:not(.gateway-mode) main{padding:10px}body:not(.gateway-mode) .card{padding:14px}body:not(.gateway-mode) .row{display:grid;grid-template-columns:1fr;gap:0}body:not(.gateway-mode) nav{top:60px}}
+
+</style>
+</head>
+<body class="gateway-mode">
+<div id="splash"><div><div class="logo">HT</div><h1>HONEY TALLY</h1><p class="muted">YOUR BUSINESS • YOUR ACCOUNTS</p><small>Opening your accounts…</small></div></div>
+<header><div class="row" style="align-items:center"><div style="flex:2"><h1 id="appHeaderTitle">Gateway of HONEY TALLY</h1><small id="companyLabel">Select a menu option to continue</small></div><div style="flex:1;min-width:145px"><label style="color:white;margin:0 0 4px">Current Company</label><select id="companySwitcher" aria-label="Select company" onchange="openCompany(this.value)" style="padding:8px;border-radius:9px"></select></div></div></header>
+<nav id="nav">
+<button class="active" data-page="home">Home</button><button data-page="companies">Companies</button><button data-page="entry">Smart Entry</button><button data-page="vouchers">Vouchers</button><button data-page="ledgers">Ledgers</button><button data-page="reports">Reports / Trial Balance</button><button data-page="tools">Stock / GST / Bank</button><button data-page="backup">Backup</button>
+</nav>
+<div id="backBar"><button type="button" onclick="backToGateway()">← Back to Gateway</button></div>
+<main>
+<section id="home" class="page active">
+<div class="gateway-layout"><div class="gateway-menu">
+<div class="gateway-company" id="gatewayCompany"></div>
+<div class="gateway-group">MASTERS</div>
+<button class="gateway-item selected" onclick="gatewayAction('Create',this)">Create</button>
+<button class="gateway-item" onclick="gatewayAction('Alter',this)">Alter</button>
+<button class="gateway-item" onclick="gatewayAction('Chart of Accounts',this)">Chart of Accounts</button>
+<div class="gateway-group">TRANSACTIONS</div>
+<button class="gateway-item" onclick="gatewayAction('Vouchers',this)">Vouchers</button>
+<button class="gateway-item" onclick="gatewayAction('Day Book',this)">Day Book</button>
+<div class="gateway-group">UTILITIES</div>
+<button class="gateway-item" onclick="gatewayAction('Banking',this)">Banking</button>
+<div class="gateway-group">REPORTS</div>
+<button class="gateway-item" onclick="gatewayAction('Balance Sheet',this)">Balance Sheet</button>
+<button class="gateway-item" onclick="gatewayAction('Profit & Loss A/c',this)">Profit &amp; Loss A/c</button>
+<button class="gateway-item" onclick="gatewayAction('Stock Summary',this)">Stock Summary</button>
+<button class="gateway-item" onclick="gatewayAction('Ratio Analysis',this)">Ratio Analysis</button>
+<button class="gateway-item" style="margin-top:18px" onclick="gatewayAction('Display More Reports',this)">Display More Reports</button>
+<button class="gateway-item gateway-quit" onclick="gatewayAction('Quit',this)">Quit</button>
+<div class="gateway-footer">HONEY TALLY V31 • Accounting made simple</div>
+</div></div>
+<div class="legacy-dashboard">
+<div class="card"><h2>Gateway of HONEY TALLY</h2><p class="muted">Tally-style quick menu — shortcut se voucher kholein.</p><div class="row"><button class="secondary" onclick="quickVoucher('Contra')">F4 Contra</button><button class="secondary" onclick="quickVoucher('Payment')">F5 Payment</button><button class="secondary" onclick="quickVoucher('Receipt')">F6 Receipt</button><button class="secondary" onclick="quickVoucher('Journal')">F7 Journal</button><button class="secondary" onclick="quickVoucher('Sales')">F8 Sales</button><button class="secondary" onclick="quickVoucher('Purchase')">F9 Purchase</button></div></div>
+<div class="card"><h2>Dashboard</h2><div class="muted" id="fyLabel"></div><div class="grid" style="margin-top:12px"><div class="stat">Total Debit<b id="homeDebit">₹0</b></div><div class="stat">Total Credit<b id="homeCredit">₹0</b></div><div class="stat">Vouchers<b id="homeCount">0</b></div><div class="stat">Cash Balance<b id="homeCash">₹0</b></div></div></div>
+<div class="card"><h3>Quick Actions</h3><p class="muted">Jo kaam karna hai, seedha yahin se kholein.</p><div class="row"><button class="primary" onclick="showPage('entry')">＋ New Entry</button><button class="secondary" onclick="openBillMaker()">＋ New Sales / Purchase Bill</button><button class="secondary" onclick="showPage('vouchers')">Vouchers</button><button class="secondary" onclick="showPage('ledgers')">Ledgers</button><button class="secondary" onclick="showPage('reports')">Trial Balance</button></div></div>
+<div class="card"><h3>Recent vouchers</h3><div id="recent"></div></div></div>
+</section>
+<section id="companies" class="page">
+<div class="card"><h2>＋ Create Your Company</h2>
+<div class="help-banner"><b>Asaan setup:</b> Pehle business ka naam aur address bharein. GSTIN/PAN optional hain. Company banne ke baad aap seedha voucher, bill aur reports bana sakte hain.</div>
+<div class="form-section-title">1. BUSINESS DETAILS</div>
+<label>Company / Business name <span class="bad">*</span></label><input id="coName" placeholder="Jaise: Honey Traders">
+<div class="row"><div><label>Display / Mailing name</label><input id="coMailingName" placeholder="Optional"></div><div><label>Financial year</label><select id="coFY"><option>2026-27</option><option>2025-26</option><option>2027-28</option><option>2028-29</option></select></div></div>
+<div class="form-section"><div class="form-section-title">2. BUSINESS ADDRESS</div>
+<label>Shop / Building / Street address <span class="bad">*</span></label><textarea id="coAddress" placeholder="Shop no., building, street, area"></textarea>
+<div class="row"><div><label>Country</label><select id="coCountry"><option>India</option><option>Nepal</option><option>Other</option></select></div><div><label>State / Union Territory <span class="bad">*</span></label><select id="coState"><option value="">Select State</option><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option><option>Andaman and Nicobar Islands</option><option>Chandigarh</option><option>Dadra and Nagar Haveli and Daman and Diu</option><option>Delhi</option><option>Jammu and Kashmir</option><option>Ladakh</option><option>Lakshadweep</option><option>Puducherry</option></select></div></div>
+<div class="row"><div><label>Region / Division</label><input id="coRegion" placeholder="Jaise: Vidarbha / Nagpur Division"></div><div><label>District</label><input id="coDistrict" list="districtOptions" placeholder="District ka naam"><datalist id="districtOptions"><option>Nagpur</option><option>Wardha</option><option>Amravati</option><option>Akola</option><option>Yavatmal</option><option>Bhandara</option><option>Gondia</option><option>Chandrapur</option><option>Gadchiroli</option><option>Washim</option><option>Buldhana</option><option>Pune</option><option>Mumbai</option><option>Thane</option><option>Nashik</option><option>Kolhapur</option><option>Satara</option><option>Solapur</option><option>Jalgaon</option><option>Aurangabad</option></datalist></div></div>
+<div class="row"><div><label>City / Town <span class="bad">*</span></label><input id="coCity" placeholder="Jaise: Nagpur"></div><div><label>PIN / Postal code</label><input id="coPin" inputmode="numeric" maxlength="10" placeholder="PIN code"></div></div></div>
+<div class="form-section"><div class="form-section-title">3. CONTACT & TAX DETAILS (OPTIONAL)</div>
+<div class="row"><div><label>Mobile / Phone</label><input id="coPhone" inputmode="tel" placeholder="Business mobile"></div><div><label>Email</label><input id="coEmail" type="email" placeholder="Business email"></div></div>
+<div class="row"><div><label>GSTIN</label><input id="coGstin" placeholder="If registered"></div><div><label>PAN</label><input id="coPan" placeholder="If available"></div></div>
+<label>Business type</label><select id="coBusinessType"><option>Proprietorship</option><option>Partnership</option><option>LLP</option><option>Private Limited</option><option>Public Limited</option><option>Other</option></select></div>
+<button class="primary" onclick="createCompany()">✓ Create Company & Open</button> <button class="secondary" type="button" onclick="showPage('home')">Cancel</button></div>
+<div class="card"><h3>Your companies</h3><p class="muted">Jis company ka bill banana ho, uske saamne Make Bill dabayein. Bill par usi selected company ka naam aayega. Delete karne se us company ka local data permanently mit jayega—pehle Backup zaroor lein.</p><div id="companyList"></div></div>
+</section>
+<section id="entry" class="page">
+<div class="card"><h2>✨ Smart Entry Assistant</h2><div class="help-banner"><b>Bas apni transaction likhiye:</b> Jaise “cash me furniture 2000 ka becha”, “rent 5000 bank se diya”, ya “customer se 3000 mile”. Assistant voucher type, debit-credit aur amount suggest karega. Save karne se pehle aapko preview milega.</div><div class="notice">Smart Assistant aapki Hindi/English transaction ko samajhne ki koshish karega, ledger aur voucher suggest karega, aur galti/uncertainty par warning dega. Yeh rule-based offline assistant hai; internet/live AI se connected nahi. Complex ya GST transactions ko manually verify karein. Yeh common Hindi/English transactions, sale/purchase, fixed assets aur payment modes ko pehchanne ki koshish karta hai; har suggestion save karne se pehle check karein. Save se pehle aap confirm karenge.</div>
+<div class="card" style="background:#f3f7ff;border:1px dashed #6b8fd6;margin:12px 0"><h3>📷 Entry ki Photo se Smart Entry</h3><p class="muted">Bill, notebook ya transaction ki saaf photo upload karein. Bill, receipt, notebook ya transaction photo ka text OCR se nikalkar Smart Entry mein jayega. Alag-alag photo processing se padhne ki koshish hogi. OCR text nikalta hai; AI Vision photo ka context samajhkar accounting entry ka draft banata hai. Dono options available hain. AI ke jawab mein galti ho sakti hai, isliye save karne se pehle preview zaroor check karein. Koi entry automatic save nahi hogi—har line verify karein.</p><div class="row" style="align-items:center;gap:10px"><div style="flex:1;min-width:180px"><label>Gallery se photo select karein</label><input id="smartPhoto" type="file" accept="image/*" onchange="previewSmartPhoto(event)"></div><div style="flex:1;min-width:180px"><label>Camera se nayi photo lein</label><input id="smartCameraPhoto" type="file" accept="image/*" capture="environment" onchange="previewSmartPhoto(event)"></div></div><div class="row" style="margin-top:8px"><button class="secondary" type="button" onclick="document.getElementById('smartCameraPhoto').click()">📷 Camera Kholein / Photo Click Karein</button><button class="secondary" type="button" onclick="document.getElementById('smartPhoto').click()">🖼️ Gallery Kholein</button></div><div id="smartPhotoPreview" style="margin:8px 0"></div><p class="muted">AI Vision ke liye Netlify backend deploy karein aur server par GEMINI_API_KEY set karein. API key ko HTML file mein kabhi na likhein.</p><div class="row"><button class="primary" type="button" onclick="readSmartPhoto()">🔍 OCR Photo Read Karein</button><button class="primary" type="button" onclick="analyzeSmartPhotoWithAI()">🤖 AI Vision se Samjhein</button><button class="secondary" type="button" onclick="clearSmartPhoto()">Photo Hatayein</button><span id="ocrStatus" class="muted" aria-live="polite"></span></div></div>
+<label>Transaction Hindi ya English mein likhein</label><textarea id="smartText" placeholder="e.g. Capital introduced 50000 into bank / Paid rent 5000 by cash / Goods sold for 12000 cash"></textarea><div class="row"><button class="secondary" type="button" onclick="clearSmartText()">🧹 Pura Text Hatayein</button><button class="primary" onclick="suggestEntry()">Auto-fill Single Entry</button><button class="primary" onclick="bulkSuggestEntries()">＋ Process Multiple Entries</button></div><p class="muted">Multiple entries ke liye har transaction alag line mein likhein. Jitni chahein lines add kar sakte hain; save se pehle sabka preview milega.</p><div class="row" style="margin-top:8px"><button class="secondary" type="button" onclick="tryText('Capital 50000 bank me jama kiya')">Capital in Bank</button><button class="secondary" type="button" onclick="tryText('Bank se 10000 cash nikala')">Bank to Cash</button><button class="secondary" type="button" onclick="tryText('Rent 2000 cash diya')">Rent Paid</button><button class="secondary" type="button" onclick="tryText('Owner introduced capital 50000 into bank')">English Capital</button><button class="secondary" type="button" onclick="tryText('Goods worth 20000 burnt by fire')">Goods burnt by fire</button><button class="secondary" type="button" onclick="tryText('Depreciation on furniture 5000')">Depreciation</button><button class="secondary" type="button" onclick="tryText('Rent outstanding 3000')">Outstanding Rent</button><button class="secondary" type="button" onclick="tryText('Prepaid insurance 2400 paid by bank')">Prepaid Expense</button><button class="secondary" type="button" onclick="tryText('Commission received 4000 in bank')">Commission</button><button class="secondary" type="button" onclick="tryText('Bank charges 250')">Bank Charges</button><button class="secondary" type="button" onclick="tryText('Insurance claim admitted 15000 for fire loss')">Insurance Claim</button><button class="secondary" type="button" onclick="tryText('Owner withdrew 3000 cash for personal use')">Drawings</button><button class="secondary" type="button" onclick="tryText('Goods returned by customer 2500')">Sales Return</button><button class="secondary" type="button" onclick="tryText('Goods returned to supplier 1800')">Purchase Return</button><button class="secondary" type="button" onclick="tryText('Paid creditor 4000 by bank')">Pay Creditor</button></div><div id="suggestBox"></div></div>
+<div class="card"><h2>Voucher Entry</h2><p class="muted">Normal entry ke liye debit, credit aur amount bharein. Multiple products wala bill banane ke liye neeche Full Bill Maker use karein.</p><input type="hidden" id="editId"><div class="row"><div><label>Date</label><input type="date" id="vDate"></div><div><label>Voucher type</label><select id="vType"><option>Journal</option><option>Payment</option><option>Receipt</option><option>Sales</option><option>Purchase</option><option>Contra</option></select></div></div>
+<label>Narration</label><input id="vNarration" placeholder="Transaction details">
+<div class="row"><div><label>Debit ledger</label><select id="vDebit"></select></div><div><label>Credit ledger</label><select id="vCredit"></select></div></div>
+<label>Amount (₹)</label><input type="number" min="0.01" step="0.01" id="vAmount" placeholder="0.00">
+<div class="row"><button class="primary" onclick="saveVoucher()">Save Voucher</button><button class="secondary" onclick="clearForm()">Clear</button></div><p class="muted" id="formMsg"></p></div>
+<div class="card"><h2>Full Bill Maker</h2><p class="muted">Ek bill mein jitne chahein items add karein. Har item ki quantity aur rate bharein; total khud calculate hoga. Alag-alag bills aur entries ki koi fixed limit nahi rakhi gayi.</p>
+<div class="row"><div><label>Bill type</label><select id="billType" onchange="updateBillPartyLabel()"><option value="Sales">Sales Bill</option><option value="Purchase">Purchase Bill</option></select></div><div><label>Date</label><input type="date" id="billDate"></div><div><label>Party / Payment Ledger</label><select id="billParty"></select></div></div>
+<div class="notice">Bill par upar isi company ka naam aayega jo aapne Company section mein banaya hai. Neeche customer/supplier ka naam aur address bhar sakte hain.</div>
+<label>Customer / Supplier name</label><input id="billPartyName" placeholder="Customer ya supplier ka naam">
+<label>Address (optional)</label><textarea id="billPartyAddress" placeholder="Shop / building, street, area"></textarea>
+<div class="row"><div><label>City</label><input id="billPartyCity" placeholder="City"></div><div><label>State</label><input id="billPartyState" placeholder="State"></div><div><label>PIN</label><input id="billPartyPin" inputmode="numeric" placeholder="PIN code"></div></div>
+<div class="row"><div><label>Mobile</label><input id="billPartyMobile" inputmode="tel" placeholder="Mobile number"></div><div><label>Email</label><input id="billPartyEmail" type="email" placeholder="Email"></div></div>
+<div class="row"><div><label>GSTIN</label><input id="billPartyGstin" placeholder="GSTIN, if applicable"></div><div><label>Country</label><input id="billPartyCountry" value="India"></div></div>
+<div class="row"><div><label>GST mode</label><select id="billGstMode" onchange="calcBillTotal()"><option value="none">No GST</option><option value="intra">Intra-state (CGST + SGST)</option><option value="inter">Inter-state (IGST)</option></select></div><div><label>GST rate</label><select id="billGstRate" onchange="calcBillTotal()"><option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option></select></div></div><p class="muted" id="gstBreakup">Tax: ₹0</p>
+<datalist id="stockItemOptions"></datalist><div class="tablewrap"><table id="billItems"><thead><tr><th>Item / Description</th><th>Qty</th><th>Rate (₹)</th><th>Amount (₹)</th><th></th></tr></thead><tbody id="billRows"></tbody></table></div>
+<div class="row"><button class="secondary" onclick="addBillRow()">＋ Add Item</button><div style="text-align:right;flex:1"><b>Bill Total: <span id="billTotal">₹0</span></b></div></div>
+<label>Additional narration</label><input id="billNarration" placeholder="Optional details"><button class="primary" onclick="saveFullBill()">Save Full Bill</button><p class="muted">Sales bill: Party/Cash Dr → Sales Cr. Purchase bill: Purchase Dr → Party/Cash Cr. Verify tax, discounts and accounting treatment separately.</p></div>
+</section>
+<section id="vouchers" class="page"><div class="card"><h2>Voucher Register</h2>
+<div class="notice">Din bhar ki sabhi Sales entries ko ek saath dekhne aur print karne ke liye date select karein. Original entries alag-alag hi rahengi; yeh unka combined daily statement banayega.</div>
+<div class="row"><div><label>Sales date (optional)</label><input type="date" id="dailySalesDate"></div><div style="align-self:end"><button onclick="printDailySales()">Print Daily Sales</button></div></div>
+<div class="notice">Sabhi dates ki Sales, Purchase, Payment, Receipt aur doosri voucher entries ko ek hi combined report mein lane ke liye neeche wala button dabayein.</div>
+<button class="primary" onclick="printAllEntriesReport()">Print All Entries Together</button>
+<div class="row" style="margin:10px 0"><button class="secondary" onclick="selectAllVisibleVouchers(true)">Select All Visible</button><button class="secondary" onclick="selectAllVisibleVouchers(false)">Unselect All</button><button class="danger" onclick="deleteSelectedVouchers()">Delete Selected</button><button class="danger" onclick="deleteAllCompanyVouchers()">Delete ALL Vouchers</button></div><div class="row"><div><label>Voucher register filter</label><select id="voucherFilter" onchange="renderVoucherRegister()"><option value="All">All Vouchers</option><option>Contra</option><option>Payment</option><option>Receipt</option><option>Journal</option><option>Sales</option><option>Purchase</option></select></div><div><label>Search narration / ledger</label><input id="voucherSearch" placeholder="Search..." oninput="renderVoucherRegister()"></div></div><div class="tablewrap" id="voucherTable"></div></div></section>
+<section id="ledgers" class="page">
+<div class="card"><h2>Create Ledger</h2><label>Ledger name</label><input id="ledgerName" placeholder="e.g. Office Equipment"><label>Tally Group / Nature</label><select id="ledgerGroup"><optgroup label="Assets"><option>Fixed Assets</option><option>Current Assets</option><option>Investments</option><option>Loans &amp; Advances</option></optgroup><optgroup label="Liabilities"><option>Current Liabilities</option><option>Loans (Liability)</option></optgroup><optgroup label="Capital"><option>Capital Account</option><option>Reserves &amp; Surplus</option></optgroup><optgroup label="Trading"><option>Sales Accounts</option><option>Purchase Accounts</option><option>Direct Expenses</option><option>Direct Incomes</option></optgroup><optgroup label="Profit &amp; Loss"><option>Indirect Expenses</option><option>Indirect Incomes</option></optgroup></select><div class="row"><div><label>Opening balance (₹)</label><input id="ledgerOpening" type="number" min="0" step="0.01" value="0"></div><div><label>Opening side</label><select id="ledgerOpeningSide"><option value="Dr">Debit</option><option value="Cr">Credit</option></select></div></div><button class="primary" onclick="addLedger()">Add Ledger</button><p class="muted">Cash, Bank, Capital, Sales, Purchase, Furniture, Rent, Salary, Debtors aur Creditors jaise basic ledgers default milte hain. Aap zaroorat ke hisaab se naye ledgers aur jitni chahein entries bana sakte hain.</p></div>
+<div class="card" style="border:2px solid #c9bdf5"><h3>📷 Notebook / Trial Balance Photo se Ledger List Import</h3><p class="muted">Aapki notebook jaisa format: Particular | Group | Debit (₹) | Credit (₹). Photo upload karein; OCR text nikalega. Uske baad neeche rows ko is format mein verify/correct karein. Import se Ledger name, exact Group aur Opening Dr/Cr save honge. Koi voucher automatic create nahi hoga.</p><input id="ledgerPhoto" type="file" accept="image/*" capture="environment"><div class="row"><button class="secondary" onclick="readLedgerPhoto()">📖 Photo se text padhein</button><span id="ledgerOcrStatus" class="muted"></span></div><label>OCR text / corrected ledger rows</label><textarea id="ledgerImportText" rows="9" placeholder="Opening Stock | Current Assets | Dr | 16000
+Salaries | Indirect Expenses | Dr | 20000
+Capital | Capital Account | Cr | 25000
+Creditors | Current Liabilities | Cr | 12600
+
+Format: Ledger Name | Group | Dr/Cr | Amount
+Jis ledger ka opening zero hai, use bhi | Group | Dr | 0 likh sakte hain."></textarea><div class="row"><button class="primary" onclick="previewLedgerImport()">Preview Ledger List</button><button class="secondary" onclick="document.getElementById('ledgerImportText').value='';document.getElementById('ledgerImportPreview').innerHTML=''">Clear</button></div><div id="ledgerImportPreview"></div></div>
+<div class="card"><h3>Ledger list</h3><p class="muted">Ledger list mein Particular, Group, Opening Debit aur Opening Credit sab dikhte hain. Trial Balance / notebook ke opening figures yahin se verify karein.</p><button class="danger" onclick="clearAllLedgerOpenings()">Reset ALL Ledger Opening Balances to ₹0</button><div id="ledgerTable"></div></div></section>
+<section id="reports" class="page">
+<div class="card"><h2>Trial Balance</h2><div class="row"><button class="primary" onclick="printTrialBalance()">📄 Trial Balance PDF / Print</button><button class="secondary" onclick="showPage('reports')">Refresh Report</button></div><p class="muted">Trial Balance har ledger ke net Dr/Cr balance se banta hai. Difference aaye to opening balances aur voucher postings audit karein. GST bill tax included; statutory GST return nahi.</p><div class="tablewrap" id="tbTable"></div><p id="tbTotals"></p><div id="tbAudit"></div></div>
+<div class="card"><h2>Profit & Loss (basic)</h2><div id="plReport"></div></div>
+<div class="card"><h2>Balance Sheet (basic)</h2><div id="bsReport"></div></div>
+</section>
+<section id="tools" class="page">
+<div class="card"><h2>Stock / Inventory</h2><p class="muted">Opening stock add karein. Purchase bills se quantity badhegi aur Sales bills se ghategi. Yeh basic quantity report hai.</p>
+<div class="row"><div><label>Item name</label><input id="stockItemName" placeholder="Item name"></div><div><label>Opening quantity</label><input id="stockItemOpening" type="number" min="0" step="0.01" value="0"></div><div><label>Unit</label><select id="stockItemUnit"><option>Nos</option><option>Kg</option><option>Box</option><option>Meter</option><option>Pack</option><option>Other</option></select></div></div>
+<button class="primary" onclick="addStockItem()">Add Stock Item</button><div id="stockTable" class="tablewrap"></div></div>
+<div class="card"><h2>GST Summary (Basic)</h2><p class="muted">Saved GST bills ka summary; yeh official GST return/filing nahi hai.</p><div id="gstSummary"></div></div>
+<div class="card"><h2>Bank Reconciliation (Basic)</h2><p class="muted">Bank statement se milane ke baad entries ko Reconciled mark karein. Automatic bank import abhi nahi hai.</p><label>Bank ledger</label><select id="bankLedgerSelect" onchange="renderBankRecon()"></select><div id="bankReconTable" class="tablewrap"></div></div>
+</section>
+<section id="backup" class="page"><div class="card"><h2>Backup & Restore</h2><p class="muted">Backup file apne phone me safe rakhein. Data abhi isi browser/device me save hota hai; cloud sync nahi hai.</p><button class="primary" onclick="downloadBackup()">Download Backup</button><label>Restore JSON backup</label><input type="file" id="restoreFile" accept=".json,application/json"><button class="secondary" onclick="restoreBackup()">Restore Backup</button></div></section>
+</main>
+<script>
+// HONEY TALLY V36: Notebook-style ledger master import with groups and opening Dr/Cr.
+const KEY='honey_tally_v3';
+const defaults=[
+['Cash','Current Assets'],['Bank','Current Assets'],['Debtors','Current Assets'],['Furniture','Fixed Assets'],['Computer','Fixed Assets'],['Stock','Current Assets'],['Inventory','Current Assets'],
+['Creditors','Current Liabilities'],['Loan','Loans (Liability)'],['Outstanding Expenses','Current Liabilities'],['Insurance Claim Payable','Current Liabilities'],
+['Capital','Capital Account'],['Drawings','Capital Account'],
+['Sales','Sales Accounts'],['Sales Return','Sales Accounts'],['Purchase Return','Purchase Accounts'],['Other Income','Indirect Incomes'],['Purchase','Purchase Accounts'],['Rent','Indirect Expenses'],['Salary','Indirect Expenses'],['Electricity','Indirect Expenses'],['Office Expense','Indirect Expenses'],['Depreciation','Indirect Expenses'],['Interest on Capital','Indirect Expenses'],['Discount Allowed','Indirect Expenses'],['Bank Charges','Indirect Expenses'],['Loss by Fire','Indirect Expenses'],['Loss by Theft','Indirect Expenses'],['Bad Debts','Indirect Expenses'],['Prepaid Expenses','Current Assets'],['Accrued Income','Current Assets'],['Accumulated Depreciation','Fixed Assets'],['Insurance Claim Receivable','Current Assets'],['Discount Received','Indirect Incomes'],['Commission Received','Indirect Incomes'],['Interest on Drawings','Indirect Incomes'],['Output CGST','Current Liabilities'],['Output SGST','Current Liabilities'],['Output IGST','Current Liabilities'],['Input CGST','Current Assets'],['Input SGST','Current Assets'],['Input IGST','Current Assets']
+ ];
+function groupClass(g){g=String(g||'').toLowerCase();if(['asset','fixed assets','current assets','investments','loans & advances'].includes(g))return 'Asset';if(['liability','current liabilities','loans (liability)'].includes(g))return 'Liability';if(['capital','capital account','reserves & surplus'].includes(g))return 'Capital';if(['income','sales accounts','purchase return','direct incomes','indirect incomes'].includes(g))return (g==='sales accounts'?'Income':'Income');if(['expense','direct expenses','indirect expenses','purchase accounts'].includes(g))return 'Expense';return 'Expense';}
+function suggestedGroup(name,old){const n=String(name||'').toLowerCase();if(/cash|bank|debtor|stock|inventory|prepaid|input cgst|input sgst|input igst|accrued income/.test(n))return 'Current Assets';if(/loan to |advance to /.test(n))return 'Loans & Advances';if(/furniture|computer|building|plant|machinery|vehicle|equipment|accumulated depreciation/.test(n))return 'Fixed Assets';if(/creditor|outstanding|payable|output cgst|output sgst|output igst/.test(n))return 'Current Liabilities';if(/loan/.test(n))return 'Loans (Liability)';if(/capital|drawings/.test(n))return 'Capital Account';if(/sales|sales return/.test(n))return 'Sales Accounts';if(/purchase/.test(n))return 'Purchase Accounts';if(/wages|carriage inward|freight inward|factory|manufacturing/.test(n))return 'Direct Expenses';if(/rent|salary|electricity|office|postage|bad debts|discount allowed|depreciation|bank charges|insurance|trade expenses|interest|loss by/.test(n))return 'Indirect Expenses';if(/commission received|discount received|rent received|interest received|other income|dividend/.test(n))return 'Indirect Incomes';return old==='Expense'?'Indirect Expenses':old==='Income'?'Indirect Incomes':old==='Asset'?'Current Assets':old==='Liability'?'Current Liabilities':old==='Capital'?'Capital Account':old||'Indirect Expenses';}
+let db=JSON.parse(localStorage.getItem(KEY)||'null');
+if(!db){db={companies:[{id:id(),name:'Honey Traders',fy:'2026-27',ledgers:defaults.map(x=>({name:x[0],group:x[1]})),entries:[]}],current:null};db.current=db.companies[0].id;saveDB();}
+// Add newly supported standard ledgers to existing companies while preserving their current records.
+db.companies.forEach(c=>{c.billCounter=Number(c.billCounter)||1;c.ledgers=c.ledgers||[];c.ledgers.forEach(l=>{l.group=suggestedGroup(l.name,l.group)});defaults.forEach(([name,group])=>{if(!c.ledgers.some(l=>l.name.toLowerCase()===name.toLowerCase()))c.ledgers.push({name,group})});c.entries=c.entries||[];c.stockItems=c.stockItems||[];c.mailingName=c.mailingName||c.name;c.address=c.address||'';c.country=c.country||'India';c.state=c.state||'';c.region=c.region||'';c.district=c.district||'';c.city=c.city||'';c.pin=c.pin||'';c.phone=c.phone||'';c.email=c.email||'';c.gstin=c.gstin||'';c.pan=c.pan||'';c.businessType=c.businessType||''});saveDB();
+function id(){return 'HT'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function saveDB(){localStorage.setItem(KEY,JSON.stringify(db));}
+function co(){return db.companies.find(c=>c.id===db.current)||db.companies[0]}
+function money(n){return '₹'+(Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
+function showPage(p,addHistory=true){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===p));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===p));document.body.classList.toggle('gateway-mode',p==='home');const title=document.getElementById('appHeaderTitle');if(title)title.textContent=p==='home'?'Gateway of HONEY TALLY':'HONEY TALLY';const back=document.getElementById('backBar');if(back)back.style.display=p==='home'?'none':'block';if(addHistory){try{history.pushState({honeyTallyPage:p},'',location.href)}catch(e){}}render()}
+function backToGateway(){showPage('home');}
+window.addEventListener('popstate',()=>{showPage('home',false)});
+function gatewayAction(action,el){document.querySelectorAll('.gateway-item').forEach(x=>x.classList.remove('selected'));if(el)el.classList.add('selected');const routes={'Create':'companies','Alter':'ledgers','Chart of Accounts':'ledgers','Vouchers':'vouchers','Day Book':'vouchers','Banking':'tools','Balance Sheet':'reports','Profit & Loss A/c':'reports','Stock Summary':'tools','Ratio Analysis':'reports','Display More Reports':'reports'};if(action==='Quit'){if(confirm('HONEY TALLY se bahar jana chahte hain? Aapka saved data delete nahi hoga.'))alert('App ko band karne ke liye browser tab close kar dein.');return;}showPage(routes[action]||'home');}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+let smartOcrWorkerPromise=null;
+let selectedSmartPhoto=null;
+function previewSmartPhoto(ev){const f=ev.target.files&&ev.target.files[0],box=document.getElementById('smartPhotoPreview');if(!f){return;}if(!f.type.startsWith('image/')){alert('Kripya image file select karein.');ev.target.value='';return;}selectedSmartPhoto=f;const other=ev.target.id==='smartCameraPhoto'?'smartPhoto':'smartCameraPhoto';document.getElementById(other).value='';const u=URL.createObjectURL(f);box.innerHTML='<img src="'+u+'" alt="Selected entry photo" style="max-width:100%;max-height:230px;border-radius:10px;border:1px solid #ccd5e5"><p class="muted">'+(ev.target.id==='smartCameraPhoto'?'Camera se li gayi photo':'Gallery se select ki gayi photo')+'</p>';document.getElementById('ocrStatus').textContent='Photo ready. Read Photo dabayein.';}
+function clearSmartText(){document.getElementById('smartText').value='';document.getElementById('suggestBox').innerHTML='';lastSmartWarnings=[];bulkDrafts=[];document.getElementById('ocrStatus').textContent='Likha hua poora text clear kar diya.';}
+function clearSmartPhoto(){selectedSmartPhoto=null;document.getElementById('smartPhoto').value='';document.getElementById('smartCameraPhoto').value='';document.getElementById('smartPhotoPreview').innerHTML='';document.getElementById('ocrStatus').textContent='Photo hata di gayi.';}
+
+async function analyzeSmartPhotoWithAI(){
+ const f=selectedSmartPhoto||document.getElementById('smartPhoto').files[0]||document.getElementById('smartCameraPhoto').files[0];
+ const status=document.getElementById('ocrStatus');
+ if(!f)return alert('Pehle camera ya gallery se bill/entry ki photo select karein.');
+ if(!f.type.startsWith('image/'))return alert('Kripya image file select karein.');
+ if(f.size>12*1024*1024)return alert('Photo 12 MB se chhoti rakhein.');
+ status.textContent='AI Vision photo ko samajh raha hai…';
+ try{
+  const imageDataUrl=await new Promise((resolve,reject)=>{
+   const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('Photo read nahi hui.'));r.readAsDataURL(f);
+  });
+  const company=co();
+  const ledgers=(company.ledgers||[]).map(l=>({name:l.name,group:l.group}));
+  const response=await fetch('/.netlify/functions/vision-entry',{
+   method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({imageDataUrl,companyName:company.name,ledgers})
+  });
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||('Server error '+response.status));
+  const extracted=(data.entryText||'').trim();
+  if(!extracted)throw new Error('AI ko entry details nahi mili. Clear photo lekar dobara try karein.');
+  const area=document.getElementById('smartText');
+  area.value=(area.value.trim()?area.value.trim()+'\n':'')+extracted;
+  area.dispatchEvent(new Event('input',{bubbles:true}));
+  area.scrollIntoView({behavior:'smooth',block:'center'});
+  bulkSuggestEntries();
+  status.textContent='AI Vision ne photo samajhkar draft banaya. Har ledger, amount aur Dr/Cr preview mein check karein; save aapki confirmation ke baad hi hoga.';
+ }catch(err){
+  status.textContent='AI Vision abhi kaam nahi kar paya.';
+  alert('AI Vision: '+err.message+'\n\nAgar app ko Netlify par deploy nahi kiya hai, to pehle diye gaye AI Vision backend package ko deploy karna hoga.');
+ }
+}
+
+async function readSmartPhoto(){
+ const f=selectedSmartPhoto||document.getElementById('smartPhoto').files[0]||document.getElementById('smartCameraPhoto').files[0],status=document.getElementById('ocrStatus');
+ if(!f)return alert('Gallery se photo select karein ya Camera se nayi photo click karein.');
+ status.textContent='Photo reader load ho raha hai…';
+ try{
+  if(!window.Tesseract){await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=resolve;sc.onerror=()=>reject(new Error('Photo reader load nahi hua. Internet connection check karein.'));document.head.appendChild(sc);});}
+  status.textContent='Photo ko clear aur readable banaya ja raha hai…';
+  const bitmap=await createImageBitmap(f);
+  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+  const scale=Math.min(2.5,Math.max(1.4,2200/Math.max(bitmap.width,bitmap.height)));
+  canvas.width=Math.round(bitmap.width*scale);canvas.height=Math.round(bitmap.height*scale);
+  ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
+  const img=ctx.getImageData(0,0,canvas.width,canvas.height),d=img.data;
+  for(let i=0;i<d.length;i+=4){
+   const gray=d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114;
+   const contrast=Math.max(0,Math.min(255,(gray-128)*1.45+128));
+   d[i]=d[i+1]=d[i+2]=contrast;
+  }
+  ctx.putImageData(img,0,0);
+  status.textContent='Photo ke multiple versions se Hindi/English text padha ja raha hai…';
+  const variants=[canvas];
+  const threshold=document.createElement('canvas');threshold.width=canvas.width;threshold.height=canvas.height;
+  const tx=threshold.getContext('2d');tx.drawImage(canvas,0,0);const ti=tx.getImageData(0,0,threshold.width,threshold.height);
+  for(let i=0;i<ti.data.length;i+=4){const v=ti.data[i]>155?255:0;ti.data[i]=ti.data[i+1]=ti.data[i+2]=v;}
+  tx.putImageData(ti,0,0);variants.push(threshold);
+  let best={data:{text:'',confidence:0}};
+  for(let vi=0;vi<variants.length;vi++){
+   status.textContent='Reading photo version '+(vi+1)+'/'+variants.length+'…';
+   const r=await Tesseract.recognize(variants[vi],'eng+hin',{logger:m=>{if(m.status==='recognizing text')status.textContent='Photo read ho rahi hai: '+Math.round((m.progress||0)*100)+'%';}});
+   if((r.data.text||'').trim().length>(best.data.text||'').trim().length)best=r;
+  }
+  const result=best;
+  const extracted=(result.data.text||'').replace(/\r/g,'').split('\n')
+   .map(x=>x.replace(/[|]/g,' ').replace(/\s+/g,' ').trim())
+   .filter(x=>x && !/^(ledger|debit|credit|amount|date|particulars|total|trial balance|invoice|bill no)/i.test(x))
+   .join('\n');
+  if(!extracted){status.textContent='Text nahi mila. Photo seedhi, clear aur roshni mein lekar try karein.';return;}
+  const area=document.getElementById('smartText');
+  area.value=(area.value.trim()?area.value.trim()+'\n':'')+extracted;
+  area.dispatchEvent(new Event('input',{bubbles:true}));
+  area.scrollIntoView({behavior:'smooth',block:'center'});
+  bulkSuggestEntries();
+  status.textContent='Photo text read ho gaya. Neeche line-wise preview check karein. Koi entry bina aapki confirmation save nahi hogi.';
+ }catch(err){status.textContent='Photo read nahi ho payi.';alert('Photo OCR error: '+err.message+'\nInternet check karein aur photo ko clear, seedha aur roshni mein lekar dobara try karein.');}
+}
+
+function createCompany(){
+ const val=id=>document.getElementById(id).value.trim();
+ const n=val('coName'), address=val('coAddress'), state=val('coState'), city=val('coCity');
+ if(!n)return alert('Company name zaroor bharein.');
+ if(!address||!state||!city)return alert('Company ka address, state aur city zaroor bharein.');
+ const c={
+  id:id(),name:n,mailingName:val('coMailingName')||n,fy:val('coFY')||'2026-27',
+  address,country:val('coCountry')||'India',state,region:val('coRegion'),district:val('coDistrict'),city,pin:val('coPin'),
+  phone:val('coPhone'),email:val('coEmail'),gstin:val('coGstin'),pan:val('coPan'),
+  businessType:val('coBusinessType'),billCounter:1,
+  ledgers:defaults.map(x=>({name:x[0],group:x[1]})),entries:[],stockItems:[]
+ };
+ db.companies.push(c);db.current=c.id;saveDB();
+ ['coName','coMailingName','coAddress','coState','coRegion','coDistrict','coCity','coPin','coPhone','coEmail','coGstin','coPan'].forEach(x=>document.getElementById(x).value='');
+ render();alert('Company create ho gayi. Ab company ki details bills par print hongi.');showPage('home');
+}
+function openCompany(cid){db.current=cid;saveDB();render();showPage('home');}
+function openCompanyForBill(cid){
+ openCompany(cid);
+ showPage('vouchers');
+ setTimeout(()=>{
+   const el=document.getElementById('billType');
+   if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}
+ },100);
+}
+function openBillMaker(){
+ showPage('vouchers');
+ setTimeout(()=>{
+   const el=document.getElementById('billType');
+   if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+ },100);
+}
+function deleteCompany(cid){
+ const company=db.companies.find(x=>x.id===cid);
+ if(!company)return;
+ if(db.companies.length<=1)return alert('Aakhri company delete nahi kar sakte. Pehle ek nayi company banayein.');
+ const confirmName=prompt('Company "'+company.name+'" aur uska poora local data delete hoga. Confirm karne ke liye company ka exact naam likhein:');
+ if(confirmName===null)return;
+ if(confirmName.trim()!==company.name)return alert('Company ka naam match nahi hua. Delete cancel kar diya.');
+ if(!confirm('Aakhri confirmation: '+company.name+' ke sabhi vouchers, ledgers aur bills permanently delete honge. Pehle Backup le liya hai?'))return;
+ db.companies=db.companies.filter(x=>x.id!==cid);
+ if(db.current===cid)db.current=db.companies[0].id;
+ saveDB();render();
+ alert('Company aur uska data is browser se delete ho gaya.');
+}
+function editOpening(name){let l=co().ledgers.find(x=>x.name===name);if(!l)return;let cur=Number(l.openingDr)||Number(l.openingCr)||0;let amt=prompt('Opening balance amount for '+name+' (₹)',String(cur));if(amt===null)return;let n=Number(amt);if(!Number.isFinite(n)||n<0)return alert('Valid non-negative amount enter karein');let side=prompt('Side likhein: Dr ya Cr',Number(l.openingCr)>0?'Cr':'Dr');if(side===null)return;side=side.trim().toLowerCase();if(!['dr','cr'].includes(side))return alert('Side Dr ya Cr honi chahiye');l.openingDr=side==='dr'?n:0;l.openingCr=side==='cr'?n:0;saveDB();render();}
+function clearLedgerOpening(name){const l=co().ledgers.find(x=>x.name===name);if(!l)return;if(!confirm(name+' ka opening balance ₹0 karna hai? Isse sirf opening balance badlega, vouchers nahi.'))return;l.openingDr=0;l.openingCr=0;saveDB();render();alert(name+' ka opening balance ₹0 kar diya gaya.')}
+function clearAllLedgerOpenings(){const list=co().ledgers.filter(l=>(Number(l.openingDr)||0)!==0||(Number(l.openingCr)||0)!==0);if(!list.length)return alert('Kisi bhi Ledger mein opening balance nahi hai.');if(!confirm('Is company ke '+list.length+' Ledger opening balances ₹0 ho jayenge. Vouchers safe rahenge. Kya continue karein?'))return;list.forEach(l=>{l.openingDr=0;l.openingCr=0});saveDB();render();alert('Sabhi Ledger opening balances ₹0 kar diye gaye.')}
+function normImportGroup(g){let x=String(g||'').trim().toLowerCase().replace(/\s+/g,' ');const map={'fixed asset':'Fixed Assets','fixed assets':'Fixed Assets','current asset':'Current Assets','current assets':'Current Assets','capital a/c':'Capital Account','capital account':'Capital Account','capital':'Capital Account','sales a/c':'Sales Accounts','sales account':'Sales Accounts','sales accounts':'Sales Accounts','purchase a/c':'Purchase Accounts','purchase account':'Purchase Accounts','purchase accounts':'Purchase Accounts','direct expense':'Direct Expenses','direct expenses':'Direct Expenses','indirect expense':'Indirect Expenses','indirect expenses':'Indirect Expenses','direct income':'Direct Incomes','direct incomes':'Direct Incomes','indirect income':'Indirect Incomes','indirect incomes':'Indirect Incomes','current liability':'Current Liabilities','current liabilities':'Current Liabilities','loans (liability)':'Loans (Liability)','loan liability':'Loans (Liability)','loans & advances':'Loans & Advances','loans and advances':'Loans & Advances','investments':'Investments','reserves & surplus':'Reserves & Surplus'};return map[x]||g.trim();}
+function parseLedgerImportLine(line){let z=line.trim().replace(/^\s*\d+[.)-]?\s*/,'');if(!z)return null;let a=z.split(/[|;\t]+/).map(x=>x.trim()).filter(Boolean);if(a.length>=4){let name=a[0],group=normImportGroup(a[1]),side=a[2].toLowerCase(),amt=Number(a[3].replace(/[₹, ]/g,''));if(name&&group&&['dr','debit','cr','credit'].includes(side)&&Number.isFinite(amt)&&amt>=0)return {name,group,side:/^(cr|credit)$/.test(side)?'Cr':'Dr',amount:amt};}
+// OCR fallback: identify a known group phrase and a final numeric amount. OCR cannot reliably infer debit/credit column; flag it for manual review.
+let groups=['Current Liabilities','Indirect Expenses','Direct Expenses','Indirect Incomes','Direct Incomes','Current Assets','Fixed Assets','Capital A/c','Capital Account','Purchase A/c','Purchase Accounts','Sales A/c','Sales Accounts','Loans & Advances','Loans (Liability)','Investments','Reserves & Surplus'];let low=z.toLowerCase(),hit=groups.sort((x,y)=>y.length-x.length).find(g=>low.includes(g.toLowerCase()));let m=z.match(/(?:₹\s*)?([0-9][0-9,]*(?:\.\d{1,2})?)\s*$/);if(hit&&m){let name=z.slice(0,low.indexOf(hit.toLowerCase())).replace(/[|,:-]+$/,'').trim();let amount=Number(m[1].replace(/,/g,''));if(name&&Number.isFinite(amount))return {name,group:normImportGroup(hit),side:'Dr',amount,needsSide:true};}return null;}
+function previewLedgerImport(){const raw=document.getElementById('ledgerImportText').value;const rows=raw.split(/\n+/).map(parseLedgerImportLine).filter(Boolean);if(!rows.length){document.getElementById('ledgerImportPreview').innerHTML='<div class="notice bad">Koi valid row nahi mili. Har row ko Name | Group | Dr/Cr | Amount format mein likhein. OCR se nikle text ko bhi pehle isi format mein sudharein.</div>';return;}window.pendingLedgerImport=rows;document.getElementById('ledgerImportPreview').innerHTML='<div class="notice"><b>'+rows.length+' rows mili.</b> OCR se banayi row mein Dr/Cr hamesha verify karein.</div><div class="tablewrap"><table><tr><th>Particular</th><th>Group</th><th>Opening Dr</th><th>Opening Cr</th><th>Review</th></tr>'+rows.map((r,i)=>`<tr><td>${esc(r.name)}</td><td>${esc(r.group)}</td><td>${r.side==='Dr'?money(r.amount):'—'}</td><td>${r.side==='Cr'?money(r.amount):'—'}</td><td>${r.needsSide?'⚠ Side verify karein':'✓'}</td></tr>`).join('')+'</table></div><button class="primary" onclick="confirmLedgerImport()">Confirm & Import '+rows.length+' Ledgers</button>'}
+function confirmLedgerImport(){let rows=window.pendingLedgerImport||[];if(!rows.length)return;if(rows.some(r=>r.needsSide))return alert('OCR row mein Debit/Credit column reliably identify nahi hua. In rows ko Name | Group | Dr/Cr | Amount format mein manually correct karein.');if(!confirm(rows.length+' ledger rows import/update karni hain? Existing ledger ke opening balances replace honge.'))return;let added=0,updated=0;rows.forEach(r=>{let l=co().ledgers.find(x=>x.name.toLowerCase()===r.name.toLowerCase());if(!l){l={name:r.name,group:r.group};co().ledgers.push(l);added++;}else{updated++;l.group=r.group;}l.openingDr=r.side==='Dr'?r.amount:0;l.openingCr=r.side==='Cr'?r.amount:0;});saveDB();window.pendingLedgerImport=[];document.getElementById('ledgerImportPreview').innerHTML='';render();alert('Import complete: '+added+' new ledgers, '+updated+' updated. Trial Balance check karein.');}
+async function readLedgerPhoto(){const f=document.getElementById('ledgerPhoto').files[0],status=document.getElementById('ledgerOcrStatus');if(!f)return alert('Pehle notebook ki photo select karein.');status.textContent='OCR load ho raha hai…';try{if(!window.Tesseract)await new Promise((ok,no)=>{let sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=ok;sc.onerror=()=>no(Error('OCR load nahi hua; internet check karein.'));document.head.appendChild(sc)});status.textContent='Photo read ho rahi hai…';let result=await Tesseract.recognize(f,'eng',{logger:m=>{if(m.status==='recognizing text')status.textContent='Reading '+Math.round((m.progress||0)*100)+'%'}});document.getElementById('ledgerImportText').value=result.data.text;status.textContent='Text aa gaya. Ab rows ko Name | Group | Dr/Cr | Amount format mein verify/correct karein.';}catch(e){status.textContent='Photo read nahi hui';alert(e.message||String(e));}}
+function addLedger(){let n=document.getElementById('ledgerName').value.trim(),g=document.getElementById('ledgerGroup').value,raw=document.getElementById('ledgerOpening').value,ob=raw===''?0:Number(raw),side=document.getElementById('ledgerOpeningSide').value;if(!n)return alert('Ledger name likhein');if(!Number.isFinite(ob)||ob<0)return alert('Valid non-negative opening balance enter karein');if(co().ledgers.some(x=>x.name.toLowerCase()===n.toLowerCase()))return alert('Ye ledger pehle se hai');co().ledgers.push({name:n,group:g,openingDr:side==='Dr'?ob:0,openingCr:side==='Cr'?ob:0});saveDB();document.getElementById('ledgerName').value='';document.getElementById('ledgerOpening').value='0';document.getElementById('ledgerOpeningSide').value='Dr';render();alert('Ledger add ho gaya. Opening balance '+(ob===0?'₹0 (default)':'₹'+ob)+' hai.')}
+function fillSelects(){let opts=co().ledgers.map(l=>`<option>${esc(l.name)}</option>`).join('');['vDebit','vCredit'].forEach(x=>document.getElementById(x).innerHTML=opts)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function clearForm(){document.getElementById('editId').value='';document.getElementById('vNarration').value='';document.getElementById('vAmount').value='';document.getElementById('formMsg').textContent='';document.getElementById('vDate').value=new Date().toISOString().slice(0,10);document.getElementById('vType').value='Journal';}
+function saveVoucher(){let amount=Number(document.getElementById('vAmount').value),debit=document.getElementById('vDebit').value,credit=document.getElementById('vCredit').value;if(!(amount>0)||!Number.isFinite(amount))return alert('Valid amount enter karein');if(!debit||!credit||debit===credit)return alert('Debit aur Credit me alag ledgers select karein');if(!co().ledgers.some(x=>x.name===debit)||!co().ledgers.some(x=>x.name===credit))return alert('Selected ledger company me available nahi hai.');if(!document.getElementById('vDate').value)return alert('Voucher date select karein');if(!confirm('Entry verify kar li?\\nDebit: '+debit+'\\nCredit: '+credit+'\\nAmount: '+money(amount)+'\\nSave karein?'))return;let e={id:document.getElementById('editId').value||id(),date:document.getElementById('vDate').value||new Date().toISOString().slice(0,10),voucher:document.getElementById('vType').value,amount,narration:document.getElementById('vNarration').value,debitLedger:debit,creditLedger:credit};let i=co().entries.findIndex(x=>x.id===e.id);if(i>=0)co().entries[i]=e;else co().entries.push(e);saveDB();clearForm();render();document.getElementById('formMsg').textContent='Voucher saved.';alert('Voucher save ho gaya.')}
+function editVoucher(eid){let e=co().entries.find(x=>x.id===eid);if(!e)return;showPage('entry');document.getElementById('editId').value=e.id;document.getElementById('vDate').value=e.date;document.getElementById('vType').value=e.voucher;document.getElementById('vNarration').value=e.narration;document.getElementById('vAmount').value=e.amount;document.getElementById('vDebit').value=e.debitLedger;document.getElementById('vCredit').value=e.creditLedger;document.getElementById('formMsg').textContent='Editing voucher — save karne par update hoga.'}
+function deleteVoucher(eid){if(!confirm('Is voucher ko delete karein?'))return;co().entries=co().entries.filter(x=>x.id!==eid);saveDB();render()}
+function updateBillPartyLabel(){let type=document.getElementById('billType').value;let sel=document.getElementById('billParty');let preferred=type==='Sales'?'Debtors':'Creditors';sel.innerHTML=co().ledgers.map(l=>`<option value="${esc(l.name)}">${esc(l.name)}</option>`).join('');if(co().ledgers.some(l=>l.name===preferred))sel.value=preferred;}
+function addBillRow(desc='',qty=1,rate=''){let tr=document.createElement('tr');tr.innerHTML=`<td><input class="bi-desc" list="stockItemOptions" placeholder="Item name" value="${esc(desc)}"></td><td><input class="bi-qty" type="number" min="0.01" step="0.01" value="${qty}" oninput="calcBillTotal()"></td><td><input class="bi-rate" type="number" min="0" step="0.01" value="${rate}" placeholder="0" oninput="calcBillTotal()"></td><td class="bi-amount">₹0</td><td><button class="danger" type="button" onclick="this.closest('tr').remove();calcBillTotal()">×</button></td>`;document.getElementById('billRows').appendChild(tr);calcBillTotal();}
+function calcBillTotal(){let base=0;document.querySelectorAll('#billRows tr').forEach(tr=>{let q=Number(tr.querySelector('.bi-qty').value)||0,r=Number(tr.querySelector('.bi-rate').value)||0,a=q*r;base+=a;tr.querySelector('.bi-amount').textContent=money(a)});let mode=document.getElementById('billGstMode').value,rate=Number(document.getElementById('billGstRate').value)||0,tax=mode==='none'?0:base*rate/100;let total=base+tax;document.getElementById('billTotal').textContent=money(total);document.getElementById('gstBreakup').textContent=mode==='intra'?`Taxable ${money(base)} • CGST ${money(tax/2)} • SGST ${money(tax/2)} • Total ${money(total)}`:mode==='inter'?`Taxable ${money(base)} • IGST ${money(tax)} • Total ${money(total)}`:`Taxable ${money(base)} • Tax ${money(0)} • Total ${money(total)}`;return {base,tax,total,mode,rate};}
+function saveFullBill(){
+ let rows=[...document.querySelectorAll('#billRows tr')].map(tr=>({
+   description:tr.querySelector('.bi-desc').value.trim(),
+   qty:Number(tr.querySelector('.bi-qty').value),
+   rate:Number(tr.querySelector('.bi-rate').value)
+ }));
+ if(!rows.length||rows.some(x=>!x.description||!(x.qty>0)||x.rate<0||!Number.isFinite(x.rate)))
+   return alert('Har item ka naam, valid quantity aur rate bharein.');
+ let calc=calcBillTotal(),{base,tax,total,mode}=calc;
+ if(!(total>0))return alert('Bill total zero nahi hona chahiye.');
+ let type=document.getElementById('billType').value,
+     party=document.getElementById('billParty').value,
+     date=document.getElementById('billDate').value;
+ if(!date||!party)return alert('Date aur party/payment ledger select karein.');
+ if((type==='Sales'&&party==='Sales')||(type==='Purchase'&&party==='Purchase'))
+   return alert('Party ledger select karein, sales/purchase ledger nahi.');
+
+ let company=co();
+ company.billCounter=Number(company.billCounter)||1;
+ let billNo=(type==='Sales'?'S-':'P-')+String(company.billCounter).padStart(4,'0');
+ let debit=type==='Sales'?party:'Purchase',
+     credit=type==='Sales'?'Sales':party;
+ let postings=[];
+ if(type==='Sales'){
+   postings.push({ledger:party,side:'Dr',amount:total},{ledger:'Sales',side:'Cr',amount:base});
+   if(tax&&mode==='intra')postings.push({ledger:'Output CGST',side:'Cr',amount:tax/2},{ledger:'Output SGST',side:'Cr',amount:tax/2});
+   if(tax&&mode==='inter')postings.push({ledger:'Output IGST',side:'Cr',amount:tax});
+ }else{
+   postings.push({ledger:'Purchase',side:'Dr',amount:base},{ledger:party,side:'Cr',amount:total});
+   if(tax&&mode==='intra')postings.push({ledger:'Input CGST',side:'Dr',amount:tax/2},{ledger:'Input SGST',side:'Dr',amount:tax/2});
+   if(tax&&mode==='inter')postings.push({ledger:'Input IGST',side:'Dr',amount:tax});
+ }
+ // Automatically create GST ledgers if required.
+ postings.forEach(p=>{
+   if(!company.ledgers.some(l=>l.name===p.ledger)){
+     let group=/^Output/.test(p.ledger)?'Liability':(/^Input/.test(p.ledger)?'Asset':(p.ledger==='Sales'?'Income':'Expense'));
+     company.ledgers.push({name:p.ledger,group});
+   }
+ });
+ let partyName=document.getElementById('billPartyName').value.trim();
+ let partyAddress=document.getElementById('billPartyAddress').value.trim();
+ let partyMobile=document.getElementById('billPartyMobile').value.trim();
+ let partyCity=document.getElementById('billPartyCity').value.trim();
+ let partyState=document.getElementById('billPartyState').value.trim();
+ let partyPin=document.getElementById('billPartyPin').value.trim();
+ let partyEmail=document.getElementById('billPartyEmail').value.trim();
+ let partyCountry=document.getElementById('billPartyCountry').value.trim();
+ let partyGstin=document.getElementById('billPartyGstin').value.trim();
+ let narration=(partyName?partyName+' — ':'')+
+   rows.map(x=>x.description+' ('+x.qty+' × '+money(x.rate)+')').join(', ')+
+   (document.getElementById('billNarration').value.trim()?' | '+document.getElementById('billNarration').value.trim():'');
+ if(!confirm(`${type} bill ${billNo} save karein?\nItems: ${rows.length}\nTaxable: ${money(base)}\nGST: ${money(tax)}\nTotal: ${money(total)}\nSave karne ke baad bill number agle bill ke liye badhega.`))return;
+ company.entries.push({
+   id:id(),billNo,date,voucher:type,amount:total,narration,
+   debitLedger:debit,creditLedger:credit,postings,items:rows,
+   partyName,partyAddress,partyMobile,partyCity,partyState,partyPin,partyEmail,partyCountry,partyGstin,bill:true,
+   taxable:base,taxAmount:tax,gstMode:mode,gstRate:calc.rate,
+   companyName:company.name
+ });
+ company.billCounter++;
+ saveDB();render();
+ document.getElementById('billRows').innerHTML='';addBillRow();
+ ['billPartyName','billPartyAddress','billPartyMobile','billPartyCity','billPartyState','billPartyPin','billPartyEmail','billPartyGstin','billNarration'].forEach(x=>document.getElementById(x).value='');document.getElementById('billPartyCountry').value='India';
+ alert('Full bill save ho gaya. Vouchers mein jaakar Print Bill karein.');
+ showPage('vouchers');
+}
+function saveSuggestedVoucher(){
+ const amount=Number(document.getElementById('vAmount').value);
+ const debit=document.getElementById('vDebit').value, credit=document.getElementById('vCredit').value;
+ if(!(amount>0)||!debit||!credit||debit===credit)return alert('Pehle suggested entry aur amount check karein.');
+ saveVoucher();
+}
+function tryText(v){document.getElementById('smartText').value=v;suggestEntry();}
+let lastSmartWarnings=[];
+function suggestEntry(){
+ let raw=document.getElementById('smartText').value.trim(),t=raw.toLowerCase();
+ if(!raw){document.getElementById('suggestBox').innerHTML='<div class="notice bad">Pehle transaction likhein.</div>';return}
+ let nums=raw.match(/[0-9]+(?:,[0-9]{3})*(?:\.[0-9]+)?/g)||[];
+ let amount=nums.length?Number(nums[0].replace(/,/g,'')):0;
+ let debit='',credit='',type='Journal',warnings=[];
+ const has=re=>re.test(t);
+ const bank=has(/\bbank\b|bank account|upi|online|neft|imps|cheque|cheque/);
+ const cash=has(/\bcash\b|cash in hand|nakad|नकद|रोकड़|नगद/);
+ const creditWords=has(/\bon credit\b|\bcredit\b|\budhar\b|later|pay later|due|outstanding|बाकी|उधार|उधारी|बाद में भुगतान/);
+ const capitalWords=has(/capital|investment|invested|owner introduced|owner invested|introduced by owner|business started with|proprietor|पूंजी|पूँजी|निवेश/);
+ const fromBankToCash=has(/bank\s+(se|to)\s+cash|cash\s+withdrawn?\s+from\s+bank|withdraw(?:al|n)?\s+from\s+bank|withdrew.*bank|withdraw.*bank|cash from bank|बैंक से नकद|बैंक से पैसे निकाले/);
+ const cashToBank=has(/cash\s+(deposited|deposit)\s+(?:in|into|to)\s+bank|deposit(?:ed)?\s+(?:[₹$]?\s*[0-9,]+\s+)?cash\s+(?:in|into|to)\s+bank|deposit(?:ed)?\s+(?:[₹$]?\s*[0-9,]+\s+)?(?:cash )?(?:in|into|to)\s+bank|cash\s+to\s+bank|cash.*bank me jama|बैंक में जमा|बैंक मे जमा/);
+ // Specific patterns are evaluated before generic paid/received rules.
+ if(has(/capital withdrawn|owner withdrew|proprietor withdrew|personal use|drawings|आहरण|मालिक ने निकाला/)){
+   debit='Drawings';credit=bank?'Bank':'Cash';type='Payment';
+ } else if(has(/insurance claim (?:received|settled|paid)|claim amount received/)){
+   debit='Bank';credit='Insurance Claim Receivable';type='Receipt';
+ } else if(has(/insurance claim (?:admitted|approved|accepted)|claim admitted|claim approved/)){
+   debit='Insurance Claim Receivable';credit='Loss by Fire';type='Journal';
+   warnings.push('Claim-approved amount ko hi yahan enter karein; baaki uninsured loss Loss by Fire mein rahega.');
+ } else if(capitalWords){
+   debit=bank?'Bank':'Cash';credit='Capital';type='Receipt';
+ } else if(fromBankToCash){debit='Cash';credit='Bank';type='Contra'}
+ else if(cashToBank){debit='Bank';credit='Cash';type='Contra'}
+ else if(has(/depreciat|asset value reduced|wear and tear|घिसावट|मूल्यह्रास/)){
+   debit='Depreciation';credit='Accumulated Depreciation';type='Journal';
+ }
+ else if(has(/outstanding (?:rent|salary|wages|electricity|expense)|(?:rent|salary|wages|electricity|expenses?) outstanding|expense incurred but not paid|accrued expense|बकाया किराया|बकाया वेतन/)){
+   debit=has(/rent|किराया/)?'Rent':has(/salary|wages|वेतन/)?'Salary':has(/electricity/)?'Electricity':'Office Expense';credit='Outstanding Expenses';type='Journal';
+ }
+ else if(has(/prepaid|paid in advance|advance (?:rent|insurance|salary)|अग्रिम भुगतान/)){
+   debit='Prepaid Expenses';credit=bank?'Bank':'Cash';type='Payment';
+ }
+ else if(has(/accrued income|income accrued|interest accrued|commission accrued|earned but not received|आय अर्जित|प्राप्य आय/)){
+   debit='Accrued Income';credit=has(/commission/)?'Commission Received':has(/interest/)?'Other Income':'Other Income';type='Journal';
+ }
+ else if(has(/interest on capital|interest allowed on capital|पूंजी पर ब्याज/)){
+   debit='Interest on Capital';credit='Capital';type='Journal';
+ }
+ else if(has(/interest on drawings|drawings.*interest|ब्याज.*आहरण|आहरण.*ब्याज/)){
+   debit='Drawings';credit='Interest on Drawings';type='Journal';
+ }
+ else if(has(/discount allowed|allowed discount|customer discount|ग्राहक को छूट/)){
+   debit='Discount Allowed';credit='Debtors';type='Journal';
+   warnings.push('Discount Allowed ke settlement mein Cash/Bank bhi hota hai. Yeh 2-ledger draft sirf discount adjustment dikhata hai; poori settlement ke liye multi-ledger voucher zaroori hai.');
+ }
+ else if(has(/discount received|received discount|supplier discount|छूट प्राप्त/)){
+   debit='Creditors';credit='Discount Received';type='Journal';
+ }
+ else if(has(/bank charges?|bank fee|service charge|cheque return charge|बैंक शुल्क/)){
+   debit='Bank Charges';credit='Bank';type='Payment';
+ }
+ else if(has(/commission received|received commission|commission income|कमीशन प्राप्त/)){
+   debit=bank?'Bank':'Cash';credit='Commission Received';type='Receipt';
+ }
+ else if(has(/(?:goods?|stock|inventory|maal|सामान|माल).{0,55}(?:burnt|burned|burnt\s+by\s+fire|burned\s+by\s+fire|destroyed|damaged|lost).{0,35}(?:fire|accidental fire|aag)?|(?:burnt|burned|destroyed|damaged|lost).{0,35}(?:by fire|in fire|due to fire|in a fire)|fire.{0,45}(?:destroyed|burnt|burned|damaged|stock|goods|inventory)|(?:godown|warehouse|shop|factory).{0,35}(?:fire|burnt|burned)|(?:aag|आग).{0,45}(?:maal|stock|goods|inventory|माल|सामान)|(?:maal|माल|सामान).{0,35}(?:jal gaya|jal gya|jal gaye|aag mein|aag se)|आग में जल|आग से जल|आग लगने से/)){
+   debit='Loss by Fire';credit='Stock';type='Journal';
+   if(has(/insurance|insured|claim|बीमा/))warnings.push('Insurance ka zikr hai: total stock loss ko Loss by Fire mein aur insurer se approved/receivable claim ko alag entry mein record karein. Claim amount confirm kiye bina assume na karein.');
+   if(!has(/goods|stock|inventory|maal|माल|सामान/))warnings.push('Fire loss ke liye confirm karein ki nuksan stock/goods ka hua hai. Building ya machinery damage ho to us asset ka ledger use karein.');
+ } else if(has(/stock.{0,25}(stolen|theft)|goods?.{0,25}(stolen|theft)|theft of (stock|goods)|maal chori|माल चोरी|चोरी हो गया/)){
+   debit='Loss by Theft';credit='Stock';type='Journal';
+ } else if(has(/bad debt|debt written off|customer.{0,20}(insolvent|cannot pay)|udhar doob|खराब ऋण|डूबत ऋण/)){
+   debit='Bad Debts';credit='Debtors';type='Journal';
+ } else if(has(/sales return|goods returned by customer|customer returned goods|maal wapas aaya|ग्राहक ने माल लौटाया|बिक्री वापसी/)){
+   debit='Sales Return';credit='Debtors';type='Journal';
+ } else if(has(/purchase return|goods returned to supplier|returned goods to supplier|supplier ko maal wapas|माल वापस किया|खरीद वापसी/)){
+   debit='Creditors';credit='Purchase Return';type='Journal';
+ } else if(has(/paid (?:to )?(?:the )?creditor|creditor paid|payment to supplier|supplier payment|लेनदार को भुगतान/)){
+   debit='Creditors';credit=bank?'Bank':'Cash';type='Payment';
+ } else if(has(/received from debtor|debtor paid|customer cleared dues|customer paid outstanding|देनेदार से पैसा मिला/)){
+   debit=bank?'Bank':'Cash';credit='Debtors';type='Receipt';
+ } else if(has(/loan repaid|repaid loan|loan repayment|भुगतान किया ऋण|लोन चुकाया/)){
+   debit='Loan';credit=bank?'Bank':'Cash';type='Payment';
+ } else if(has(/loan (received|taken)|received.*loan|borrowed.*loan|loan mila|लोन मिला|ऋण मिला/)){
+   debit=bank?'Bank':'Cash';credit='Loan';type='Receipt';
+ } else if(has(/salary|wages|payroll|vetan|वेतन/)){
+   debit='Salary';credit=bank?'Bank':'Cash';type='Payment';
+ } else if(has(/rent|lease payment|kiraya|किराया/)){
+   debit='Rent';credit=bank?'Bank':'Cash';type='Payment';
+ } else if(has(/electricity|electric bill|utility bill|bijli|बिजली/)){
+   debit='Electricity';credit=bank?'Bank':'Cash';type='Payment';
+ } else if(has(/\b(sell|sell off|sold|sale of|disposed|dispose)\b.{0,35}\b(furniture|computer|machinery|machine|equipment)\b|\b(furniture|computer|machinery|machine|equipment)\b.{0,35}\b(sold|sell|disposed|dispose)\b|furniture becha|furniture bikri/)){
+   debit=creditWords?'Debtors':(bank?'Bank':'Cash');
+   credit=has(/computer/)?'Computer':has(/machinery|machine/)?'Machinery':has(/equipment/)?'Equipment':'Furniture';
+   type=creditWords?'Journal':'Receipt';
+   warnings.push('Fixed asset sale detect hui: receipt/debtor Dr aur asset ledger Cr. Agar asset ki book value aur sale value mein difference hai, to profit/loss on sale ki separate adjustment bhi karein.');
+ } else if(has(/furniture|computer|machinery|machine|building|equipment/)){
+   debit=has(/furniture/)?'Furniture':has(/computer/)?'Computer':'Stock';
+   credit=creditWords?'Creditors':(bank?'Bank':'Cash');type='Purchase';
+ } else if(has(/\bsold\b|\bsale\b|\bsales\b|sell goods|goods sold|sales made|becha|bech diya|बेचा|बेच दिया|बिक्री|माल बेचा/)){
+   debit=creditWords?'Debtors':(bank?'Bank':'Cash');credit='Sales';type='Sales';
+ } else if(has(/\bpurchase\b|\bpurchased\b|\bbought\b|buy goods|goods bought|goods purchased|maal kharida|kharida|खरीदा|खरीद|माल खरीदा/)){
+   debit='Purchase';credit=creditWords?'Creditors':(bank?'Bank':'Cash');type='Purchase';
+ } else if(has(/\breceived\b|\bcollected\b|payment received|amount received|customer paid|received from customer|paise mile|प्राप्त|मिले/)){
+   debit=bank?'Bank':'Cash';credit='Debtors';type='Receipt';
+ } else if(has(/\bpaid\b|\bpayment\b|payment made|paid to|paid for|settled.*bill|diye|भुगतान|दिए/)){
+   debit=has(/office expense|stationery|transport|freight|repair|maintenance/)?'Office Expense':'Creditors';
+   credit=bank?'Bank':'Cash';type='Payment';
+ } else warnings.push('Transaction type samajh nahi aaya. Debit/Credit manually check karein.');
+ if(!amount)warnings.push('Amount nahi mila. Amount field mein manually enter karein.');
+ if(nums.length>1)warnings.push('Text mein ek se zyada numbers hain; pehla number amount maana gaya hai. Check karein.');
+ lastSmartWarnings=warnings.slice();
+ const autoLedgerGroups={'Loss by Fire':'Expense','Loss by Theft':'Expense','Inventory':'Asset','Insurance Claim Payable':'Liability','Bad Debts':'Expense','Stock':'Asset','Debtors':'Asset','Depreciation':'Expense','Accumulated Depreciation':'Asset','Outstanding Expenses':'Liability','Prepaid Expenses':'Asset','Accrued Income':'Asset','Interest on Capital':'Expense','Drawings':'Capital','Interest on Drawings':'Income','Discount Allowed':'Expense','Discount Received':'Income','Bank Charges':'Expense','Commission Received':'Income','Insurance Claim Receivable':'Asset','Other Income':'Income','Rent':'Expense','Salary':'Expense','Electricity':'Expense','Bank':'Asset','Cash':'Asset','Capital':'Capital'};
+ [debit,credit].forEach(name=>{if(name&&!co().ledgers.some(x=>x.name.toLowerCase()===name.toLowerCase())&&autoLedgerGroups[name])co().ledgers.push({name,group:suggestedGroup(name,autoLedgerGroups[name])})});
+ saveDB();
+ let names=co().ledgers.map(x=>x.name);
+ if(!names.includes(debit)){warnings.push('Debit ledger "'+debit+'" company mein nahi hai. Ledgers mein create karein.');debit=names.includes('Cash')?'Cash':names[0]||''}
+ if(!names.includes(credit)){warnings.push('Credit ledger "'+credit+'" company mein nahi hai. Ledgers mein create karein.');credit=names.includes('Capital')?'Capital':names[0]||''}
+ document.getElementById('vDate').value=new Date().toISOString().slice(0,10);
+ document.getElementById('vType').value=type;document.getElementById('vNarration').value=raw;
+ document.getElementById('vAmount').value=amount||'';
+ if(debit)document.getElementById('vDebit').value=debit;
+ if(credit)document.getElementById('vCredit').value=credit;
+ let box=warnings.length?'<div class="notice bad"><b>AI Smart Check — please verify:</b><br>'+warnings.map(esc).join('<br>')+'</div>':'<div class="notice good"><b>Smart Check: Entry pattern matched.</b> Save se pehle details verify karein.</div>';
+ let reason=debit==='Loss by Fire'?'Fire se stock/goods ka loss: Loss by Fire Dr aur Stock Cr.':debit==='Bank'&&credit==='Capital'?'Owner ka capital bank mein aaya: Bank Dr aur Capital Cr.':'Transaction ke keywords, payment mode aur amount se ledger suggest kiye gaye hain.';
+ document.getElementById('suggestBox').innerHTML=box+'<div class="notice"><b>Suggested accounting</b><br>Voucher: '+esc(type)+'<br>Debit: '+esc(debit||'Select manually')+'<br>Credit: '+esc(credit||'Select manually')+'<br>Amount: '+(amount?money(amount):'Amount not found')+'<br><b>Why this suggestion?</b> '+esc(reason)+'<br><span class="muted">Suggestion check kar lein. Confirm karne par voucher register aur ledger mein entry save ho jayegi.</span><br><button class="primary" type="button" onclick="saveSuggestedVoucher()" '+(!(amount>0&&debit&&credit)?'disabled':'')+'>✓ Confirm & Save Entry</button></div>';
+}
+
+let bulkDrafts=[];
+function bulkSuggestEntries(){
+ const box=document.getElementById('suggestBox');
+ const lines=document.getElementById('smartText').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ if(!lines.length)return alert('Har transaction alag line mein likhein.');
+ bulkDrafts=[];
+ const original=document.getElementById('smartText').value;
+ const originalFields={
+  amount:document.getElementById('vAmount').value,
+  debit:document.getElementById('vDebit').value,
+  credit:document.getElementById('vCredit').value,
+  voucher:document.getElementById('vType').value,
+  narration:document.getElementById('vNarration').value
+ };
+ const failed=[];
+ lines.forEach((line,index)=>{
+  document.getElementById('smartText').value=line;
+  suggestEntry();
+  const amount=Number(document.getElementById('vAmount').value)||0;
+  const debit=document.getElementById('vDebit').value;
+  const credit=document.getElementById('vCredit').value;
+  const voucher=document.getElementById('vType').value;
+  if(amount>0&&debit&&credit&&debit!==credit){
+   bulkDrafts.push({id:id(),date:new Date().toISOString().slice(0,10),voucher,amount,narration:line,debitLedger:debit,creditLedger:credit,smartSource:'bulk',smartWarnings:lastSmartWarnings.slice()});
+  } else failed.push({line,reason:amount<=0?'Amount nahi mila':'Debit/Credit ledger identify nahi hua'});
+ });
+ document.getElementById('smartText').value=original;
+ document.getElementById('vAmount').value=originalFields.amount;
+ document.getElementById('vDebit').value=originalFields.debit;
+ document.getElementById('vCredit').value=originalFields.credit;
+ document.getElementById('vType').value=originalFields.voucher;
+ document.getElementById('vNarration').value=originalFields.narration;
+ if(!bulkDrafts.length){box.innerHTML='<div class="notice bad">Koi valid entry identify nahi hui. Har line mein amount aur transaction clear likhein.</div>';return;}
+ const duplicates=bulkDrafts.filter(x=>(co().entries||[]).some(e=>String(e.narration||'').trim().toLowerCase()===x.narration.trim().toLowerCase()&&Number(e.amount)===x.amount));
+ const total=bulkDrafts.reduce((a,x)=>a+x.amount,0);
+ const debitTotal=bulkDrafts.reduce((a,x)=>a+x.amount,0);
+ const creditTotal=bulkDrafts.reduce((a,x)=>a+x.amount,0);
+ const duplicateHtml=duplicates.length?'<div class="notice bad"><b>Possible duplicate:</b> '+duplicates.map(x=>esc(x.narration)).join('<br>')+'<br>Ye milti-julti entries pehle se company mein saved hain. Dobara save karne se pehle check karein.</div>':'';
+ const failedHtml=failed.length?'<div class="notice bad"><b>'+failed.length+' line(s) review ke liye chhodi gayi:</b><br>'+failed.map(x=>esc(x.line)+' — '+esc(x.reason)).join('<br>')+'</div>':'';
+ box.innerHTML='<div class="notice good"><b>Multiple Entry Preview</b><br>'+bulkDrafts.length+' entries identify hui. Debit total: '+money(debitTotal)+' • Credit total: '+money(creditTotal)+' • Difference: '+money(Math.abs(debitTotal-creditTotal))+'</div>'+duplicateHtml+failedHtml+
+ '<div class="tablewrap"><table><tr><th>#</th><th>Voucher</th><th>Narration</th><th>Debit</th><th>Credit</th><th>Amount</th></tr>'+
+ bulkDrafts.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(x.voucher)+'</td><td>'+esc(x.narration)+(x.smartWarnings&&x.smartWarnings.length?'<br><span class="bad">⚠ '+esc(x.smartWarnings.join('; '))+'</span>':'')+'</td><td>'+esc(x.debitLedger)+'</td><td>'+esc(x.creditLedger)+'</td><td>'+money(x.amount)+'</td></tr>').join('')+'</table></div>'+
+ '<button class="primary" onclick="saveBulkEntries()">✓ Confirm & Save '+bulkDrafts.length+' Valid Entries</button> <button class="secondary" onclick="bulkDrafts=[];document.getElementById(&quot;suggestBox&quot;).innerHTML=&quot;&quot;">Cancel</button>'+
+ '<p class="muted">Har simple voucher mein debit=credit amount hai; isse ledger selection sahi hona prove nahi hota. Party, payment mode aur transaction nature zaroor check karein. Galat line ko save karne se pehle edit karein.</p>';
+}
+function saveBulkEntries(){
+ if(!bulkDrafts.length)return;
+ if(!confirm('Kya aap preview ki sabhi '+bulkDrafts.length+' entries save karna chahte hain?'))return;
+ co().entries.push(...bulkDrafts);saveDB();const n=bulkDrafts.length;bulkDrafts=[];document.getElementById('suggestBox').innerHTML='<div class="notice good">'+n+' entries successfully save hui.</div>';render();
+}
+function trialBalanceRows(){
+ const m=balances();let rows=[],dr=0,cr=0;
+ Object.entries(m).forEach(([name,x])=>{
+  const b=(Number(x.dr)||0)-(Number(x.cr)||0);
+  if(Math.abs(b)<0.005)return;
+  if(b>0){dr+=b;rows.push({name,group:x.group,debit:b,credit:0})}
+  else{cr+=-b;rows.push({name,group:x.group,debit:0,credit:-b})}
+ });
+ const openingDr=co().ledgers.reduce((s,l)=>s+(Number(l.openingDr)||0),0);
+ const openingCr=co().ledgers.reduce((s,l)=>s+(Number(l.openingCr)||0),0);
+ const voucherIssues=[];
+ (co().entries||[]).forEach(e=>{
+  let d=0,c=0;
+  if(Array.isArray(e.postings)&&e.postings.length){
+   e.postings.forEach(p=>{if(p.side==='Dr')d+=Number(p.amount)||0;else if(p.side==='Cr')c+=Number(p.amount)||0;});
+  }else{d=Number(e.amount)||0;c=Number(e.amount)||0;}
+  if(Math.abs(d-c)>0.005)voucherIssues.push({id:e.id,date:e.date,voucher:e.voucher,narration:e.narration,debit:d,credit:c,diff:Math.abs(d-c)});
+ });
+ return {rows,dr,cr,diff:Math.abs(dr-cr),openingDr,openingCr,openingDiff:Math.abs(openingDr-openingCr),voucherIssues};
+}
+function printTrialBalance(){
+ const company=co(),tb=trialBalanceRows();
+ const rows=tb.rows.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.group)+'</td><td class="r">'+(x.debit?money(x.debit):'—')+'</td><td class="r">'+(x.credit?money(x.credit):'—')+'</td></tr>');
+ const w=window.open('','_blank');if(!w)return alert('PDF ke liye popup allow karein.');
+ w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Trial Balance</title><style>body{font:14px Arial;padding:28px;color:#222}h1,h2{text-align:center;margin:4px}p{text-align:center;color:#555}table{width:100%;border-collapse:collapse;margin-top:22px}td,th{border:1px solid #999;padding:9px}.r{text-align:right}tfoot{font-weight:bold}@media print{button{display:none}}</style></head><body><h1>'+esc(company.name)+'</h1><h2>TRIAL BALANCE</h2><p>Financial Year: '+esc(company.fy||'—')+' | Generated: '+new Date().toLocaleDateString('en-IN')+'</p><table><tr><th>Ledger</th><th>Group</th><th>Debit</th><th>Credit</th></tr>'+rows.join('')+'<tfoot><tr><td colspan="2">TOTAL</td><td class="r">'+money(tb.dr)+'</td><td class="r">'+money(tb.cr)+'</td></tr></tfoot></table><p>Difference: '+money(tb.diff)+'</p><button onclick="window.print()">Print / Save as PDF</button></body></html>');w.document.close();
+}
+
+function printBill(eid){
+ const e=co().entries.find(x=>x.id===eid);if(!e)return;
+ const company=co();
+ const companyName=e.companyName||company.name;
+ const companyDetails=[company.address, [company.city,company.district,company.region,company.state,company.pin].filter(Boolean).join(', '),company.country,company.phone?'Phone: '+company.phone:'',company.email?'Email: '+company.email:'',company.gstin?'GSTIN: '+company.gstin:'',company.pan?'PAN: '+company.pan:''].filter(Boolean).map(esc).join('<br>');
+ const title=e.voucher==='Sales'?'SALES BILL':e.voucher==='Purchase'?'PURCHASE BILL':'TRANSACTION RECEIPT';
+ const party=e.partyName|| (e.voucher==='Sales'?e.debitLedger:e.creditLedger);
+ const itemRows=e.items&&e.items.length
+   ?e.items.map(x=>'<tr><td>'+esc(x.description)+'</td><td>'+esc(x.qty)+'</td><td class="right">'+money(x.rate)+'</td><td class="right">'+money(x.qty*x.rate)+'</td></tr>').join('')
+   :'<tr><td>'+esc(e.narration||'Transaction')+'</td><td>1</td><td class="right">'+money(e.amount)+'</td><td class="right">'+money(e.amount)+'</td></tr>';
+ const gst=e.taxAmount?('<p><b>Taxable amount:</b> '+money(e.taxable)+'<br><b>GST ('+esc(e.gstRate)+'%):</b> '+money(e.taxAmount)+'<br><b>GST mode:</b> '+esc(e.gstMode)+'</p>'):'';
+ const partyDetails=[e.partyAddress?'<br><b>Address:</b> '+esc(e.partyAddress):'', [e.partyCity,e.partyState,e.partyPin].filter(Boolean).length?'<br>'+esc([e.partyCity,e.partyState,e.partyPin].filter(Boolean).join(', ')):'',e.partyCountry?'<br><b>Country:</b> '+esc(e.partyCountry):'',e.partyMobile?'<br><b>Mobile:</b> '+esc(e.partyMobile):'',e.partyEmail?'<br><b>Email:</b> '+esc(e.partyEmail):'',e.partyGstin?'<br><b>GSTIN:</b> '+esc(e.partyGstin):''].join('');
+ const w=window.open('','_blank');if(!w){alert('Print window blocked. Browser me pop-ups allow karein.');return}
+ w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+esc(companyName)+' - '+title+'</title><style>body{font:15px Arial;padding:28px;color:#222}h1{text-align:center;margin-bottom:4px}.sub{text-align:center;color:#666;line-height:1.5}table{width:100%;border-collapse:collapse;margin-top:20px}td,th{border:1px solid #bbb;padding:10px;text-align:left}.right{text-align:right}.muted{color:#666}.total{text-align:right;font-size:18px}</style></head><body><h1>'+esc(companyName)+'</h1><p class="sub">'+companyDetails+'<br>Financial Year: '+esc(company.fy)+'</p><hr><h2>'+title+'</h2><p><b>Bill No:</b> '+esc(e.billNo||'—')+'<br><b>Date:</b> '+esc(e.date)+'<br><b>Party:</b> '+esc(party)+partyDetails+'<br><b>Party ledger:</b> '+esc(e.voucher==='Sales'?e.debitLedger:e.creditLedger)+'</p><table><tr><th>Item / Description</th><th>Qty</th><th class="right">Rate</th><th class="right">Amount</th></tr>'+itemRows+'</table>'+gst+'<p class="total"><b>Grand Total: '+money(e.amount)+'</b></p><p style="margin-top:55px">Authorized Signature: ____________________</p><p class="muted">This is a basic accounting bill format, not a verified GST-compliant tax invoice. Check applicable tax and legal invoice requirements before official use.</p><button onclick="window.print()">Print / Save as PDF</button></body></html>');
+ w.document.close();
+}
+
+
+function printAllEntriesReport(){
+ const entries=[...(co().entries||[])].sort((a,b)=>
+   String(a.date||'').localeCompare(String(b.date||'')) ||
+   String(a.billNo||a.id||'').localeCompare(String(b.billNo||b.id||'')));
+ if(!entries.length)return alert('Abhi koi entry save nahi hai.');
+ const rows=entries.map((e,i)=>{
+   const dr=e.debitLedger||'—', cr=e.creditLedger||'—';
+   const party=e.partyName||'';
+   const details=(party?party+' — ':'')+(e.narration||e.voucher||'Entry');
+   return '<tr><td>'+(i+1)+'</td><td>'+esc(e.date||'—')+'</td><td>'+esc(e.billNo||'—')+'</td><td>'+esc(e.voucher||'—')+'</td><td>'+esc(details)+'</td><td>'+esc(dr)+'</td><td>'+esc(cr)+'</td><td class="right">'+money(Number(e.amount)||0)+'</td></tr>';
+ }).join('');
+ const total=entries.reduce((sum,e)=>sum+(Number(e.amount)||0),0);
+ const debitTotal=entries.reduce((sum,e)=>sum+(Number(e.amount)||0),0);
+ const creditTotal=debitTotal;
+ const w=window.open('','_blank');
+ if(!w)return alert('Print window blocked. Browser me pop-ups allow karein.');
+ w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+esc(co().name)+' - All Entries Report</title><style>body{font:13px Arial;padding:24px;color:#222}h1,h2{text-align:center;margin:5px}p{margin:8px 0}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{border:1px solid #aaa;padding:7px;text-align:left;vertical-align:top}th{background:#eee}.right{text-align:right}.summary{margin-top:18px;text-align:right;font-size:16px;font-weight:bold}.note{margin-top:30px;color:#666;font-size:11px}@media print{button{display:none}}</style></head><body><h1>'+esc(co().name)+'</h1><h2>Voucher Register – All Saved Entries</h2><p><b>Financial Year:</b> '+esc(co().fy||'—')+'<br><b>Total Entries:</b> '+entries.length+'<br><b>Period:</b> '+esc(entries[0].date||'—')+' to '+esc(entries[entries.length-1].date||'—')+'</p><table><thead><tr><th>#</th><th>Date</th><th>Bill No.</th><th>Voucher</th><th>Details</th><th>Debit Ledger</th><th>Credit Ledger</th><th class="right">Amount</th></tr></thead><tbody>'+rows+'</tbody></table><div class="summary">Total Entry Amount: '+money(total)+'</div><p class="note">This is an accounting voucher register, not a bill or customer tax invoice. Each saved voucher is listed separately; total amount is the sum of voucher values, not sales revenue.</p><button onclick="window.print()">Print / Save as PDF</button></body></html>');
+ w.document.close();
+}
+function printDailySales(){
+ const date=document.getElementById('dailySalesDate').value;
+ if(!date)return alert('Pehle date select karein.');
+ const sales=co().entries.filter(e=>e.date===date&&String(e.voucher).toLowerCase()==='sales');
+ if(!sales.length)return alert('Is date par koi Sales entry nahi mili.');
+ const total=sales.reduce((a,e)=>a+(Number(e.amount)||0),0);
+ const rows=sales.map((e,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(e.billNo||'Voucher '+(i+1))+'</td><td>'+esc(e.partyName||e.debitLedger||'—')+'</td><td>'+esc(e.narration||'Sales entry')+'</td><td class="right">'+money(e.amount)+'</td></tr>').join('');
+ const w=window.open('','_blank');if(!w)return alert('Print window blocked. Browser me pop-ups allow karein.');
+ w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Daily Sales Summary</title><style>body{font:14px Arial;padding:28px;color:#222}h1,h2{text-align:center;margin:5px}table{width:100%;border-collapse:collapse;margin-top:22px}td,th{border:1px solid #aaa;padding:9px;text-align:left}.right{text-align:right}.total{text-align:right;font-size:19px;margin-top:20px}.note{color:#666;font-size:12px;margin-top:35px}</style></head><body><h1>'+esc(co().name)+'</h1><h2>Combined Daily Sales Statement</h2><p><b>Date:</b> '+esc(date)+'<br><b>Total Sales Entries:</b> '+sales.length+'</p><table><tr><th>#</th><th>Voucher / Bill No.</th><th>Party</th><th>Details</th><th class="right">Amount</th></tr>'+rows+'</table><p class="total"><b>Total Daily Sales: '+money(total)+'</b></p><p class="note">This is a combined summary of separate sales entries, not a single customer tax invoice. Each original voucher remains separately saved in the accounts.</p><button onclick="window.print()">Print / Save as PDF</button></body></html>');
+ w.document.close();
+}
+
+function addStockItem(){
+ const name=document.getElementById('stockItemName').value.trim();
+ const opening=Number(document.getElementById('stockItemOpening').value)||0;
+ const unit=document.getElementById('stockItemUnit').value;
+ if(!name)return alert('Item ka naam likhein.');
+ if(opening<0)return alert('Opening quantity negative nahi ho sakti.');
+ co().stockItems=co().stockItems||[];
+ if(co().stockItems.some(x=>x.name.toLowerCase()===name.toLowerCase()))return alert('Yeh item pehle se bana hua hai.');
+ co().stockItems.push({id:id(),name,opening,unit});
+ saveDB();document.getElementById('stockItemName').value='';document.getElementById('stockItemOpening').value='0';renderTools();
+ alert('Stock item add ho gaya.');
+}
+function getStockRows(){
+ const c=co(),map={};
+ (c.stockItems||[]).forEach(x=>map[x.name]={name:x.name,unit:x.unit||'Nos',opening:Number(x.opening)||0,purchase:0,sales:0});
+ (c.entries||[]).forEach(e=>{
+  if(!Array.isArray(e.items))return;
+  e.items.forEach(it=>{
+   const n=String(it.description||'').trim();if(!n)return;
+   if(!map[n])map[n]={name:n,unit:'Nos',opening:0,purchase:0,sales:0};
+   const q=Number(it.qty)||0;
+   if(String(e.voucher).toLowerCase()==='purchase')map[n].purchase+=q;
+   if(String(e.voucher).toLowerCase()==='sales')map[n].sales+=q;
+  });
+ });
+ return Object.values(map).map(x=>({...x,closing:x.opening+x.purchase-x.sales}));
+}
+function renderBankRecon(){
+ const sel=document.getElementById('bankLedgerSelect');if(!sel)return;
+ const bank=sel.value;
+ const list=co().entries.filter(e=>e.debitLedger===bank||e.creditLedger===bank||(e.postings||[]).some(p=>p.ledger===bank));
+ const box=document.getElementById('bankReconTable');
+ if(!list.length){box.innerHTML='<p class="muted">Is bank ledger se judi entries nahi mili.</p>';return;}
+ box.innerHTML='<table><tr><th>Date</th><th>Voucher</th><th>Details</th><th>Amount</th><th>Bank match</th></tr>'+
+ list.map(e=>`<tr><td>${esc(e.date)}</td><td>${esc(e.voucher)}</td><td>${esc(e.narration||e.billNo||'—')}</td><td>${money(e.amount)}</td><td><label><input type="checkbox" ${e.reconciled?'checked':''} onchange="setReconciled('${e.id}',this.checked)"> Reconciled</label></td></tr>`).join('')+'</table>';
+}
+function setReconciled(eid,checked){const e=co().entries.find(x=>x.id===eid);if(!e)return;e.reconciled=!!checked;saveDB();renderBankRecon();}
+function renderTools(){
+ const c=co();c.stockItems=c.stockItems||[];
+ const st=document.getElementById('stockTable');
+ if(st){const rows=getStockRows();st.innerHTML=rows.length?'<table><tr><th>Item</th><th>Opening</th><th>Purchase</th><th>Sales</th><th>Closing Qty</th><th>Unit</th></tr>'+rows.map(x=>`<tr><td>${esc(x.name)}</td><td>${x.opening}</td><td>${x.purchase}</td><td>${x.sales}</td><td><b>${x.closing}</b></td><td>${esc(x.unit)}</td></tr>`).join('')+'</table>':'<p class="muted">Abhi stock item nahi hai.</p>';}
+ const gst=document.getElementById('gstSummary');
+ if(gst){const sales=c.entries.filter(e=>e.voucher==='Sales'&&e.bill),purchases=c.entries.filter(e=>e.voucher==='Purchase'&&e.bill);const sum=(a,k)=>a.reduce((t,e)=>t+(Number(e[k])||0),0);
+ gst.innerHTML='<table><tr><th>Type</th><th>Bills</th><th>Taxable</th><th>GST</th><th>Total</th></tr>'+
+ `<tr><td>Sales</td><td>${sales.length}</td><td>${money(sum(sales,'taxable'))}</td><td>${money(sum(sales,'taxAmount'))}</td><td>${money(sum(sales,'amount'))}</td></tr>`+
+ `<tr><td>Purchase</td><td>${purchases.length}</td><td>${money(sum(purchases,'taxable'))}</td><td>${money(sum(purchases,'taxAmount'))}</td><td>${money(sum(purchases,'amount'))}</td></tr></table>`;}
+ const sel=document.getElementById('bankLedgerSelect');
+ if(sel){const old=sel.value;const banks=c.ledgers.filter(l=>/bank/i.test(l.group)||/bank/i.test(l.name));sel.innerHTML=banks.map(l=>`<option value="${esc(l.name)}">${esc(l.name)}</option>`).join('');if(banks.some(l=>l.name===old))sel.value=old;renderBankRecon();}
+}
+function balances(){
+ let m={};
+ co().ledgers.forEach(l=>{
+   m[l.name]={group:l.group,dr:Number(l.openingDr)||0,cr:Number(l.openingCr)||0};
+ });
+ co().entries.forEach(e=>{
+   if(Array.isArray(e.postings)&&e.postings.length){
+     e.postings.forEach(p=>{
+       if(!m[p.ledger])m[p.ledger]={group:suggestedGroup(p.ledger,/^Output/.test(p.ledger)?'Liability':(/^Input/.test(p.ledger)?'Asset':'Expense')),dr:0,cr:0};
+       if(p.side==='Dr')m[p.ledger].dr+=Number(p.amount)||0;
+       else m[p.ledger].cr+=Number(p.amount)||0;
+     });
+   }else{
+     if(!m[e.debitLedger])m[e.debitLedger]={group:suggestedGroup(e.debitLedger,'Asset'),dr:0,cr:0};
+     if(!m[e.creditLedger])m[e.creditLedger]={group:suggestedGroup(e.creditLedger,'Liability'),dr:0,cr:0};
+     m[e.debitLedger].dr+=Number(e.amount)||0;
+     m[e.creditLedger].cr+=Number(e.amount)||0;
+   }
+ });
+ return m;
+}
+function net(l){let v=l.dr-l.cr;return ['Liability','Capital','Income'].includes(groupClass(l.group))?-v:v}
+function render(){renderTools();const switcher=document.getElementById('companySwitcher');if(switcher){switcher.innerHTML=db.companies.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');switcher.value=db.current;}let dl=document.getElementById('stockItemOptions');if(dl)dl.innerHTML=(co().stockItems||[]).map(x=>'<option value=\"'+esc(x.name)+'\">').join('');let ds=document.getElementById('dailySalesDate');if(ds&&!ds.value)ds.value=new Date().toISOString().slice(0,10);let c=co();document.getElementById('companyLabel').textContent=c.name+' • '+c.fy;let gc=document.getElementById('gatewayCompany');if(gc)gc.textContent='CURRENT COMPANY: '+c.name+'    •    '+c.fy;document.getElementById('fyLabel').textContent='Financial Year: '+c.fy;fillSelects();if(document.getElementById('billParty'))updateBillPartyLabel();let m=balances(),dr=0,cr=0;Object.values(m).forEach(x=>{dr+=x.dr;cr+=x.cr});document.getElementById('homeDebit').textContent=money(dr);document.getElementById('homeCredit').textContent=money(cr);document.getElementById('homeCount').textContent=c.entries.length;let cash=m.Cash?net(m.Cash):0;document.getElementById('homeCash').textContent=money(cash);
+let recent=[...c.entries].reverse().slice(0,5);document.getElementById('recent').innerHTML=recent.length?recent.map(e=>`<p>${esc(e.date)} • ${esc(e.voucher)} • ${money(e.amount)} <span class="muted">${esc(e.narration)}</span></p>`).join(''):'<p class="muted">Abhi koi voucher nahi.</p>';
+document.getElementById('companyList').innerHTML=db.companies.map(x=>`<div class="card" style="padding:12px;margin:8px 0"><b>${esc(x.name)}</b><div class="muted">${esc(x.fy)} • ${x.entries.length} vouchers ${x.id===db.current?'• CURRENT COMPANY':''}</div><div class="row" style="margin-top:8px"><button class="secondary" onclick="openCompany('${x.id}')">Open Company</button><button class="primary" onclick="openCompanyForBill('${x.id}')">Make Bill</button><button class="danger" onclick="deleteCompany('${x.id}')">Delete</button></div></div>`).join('');
+document.getElementById('ledgerTable').innerHTML='<div class="tablewrap"><table><tr><th>Ledger</th><th>Group</th><th>Opening Dr</th><th>Opening Cr</th><th>Net balance</th><th>Action</th></tr>'+c.ledgers.map(l=>`<tr><td>${esc(l.name)}</td><td>${esc(l.group)}</td><td>${money(l.openingDr||0)}</td><td>${money(l.openingCr||0)}</td><td>${money(net(m[l.name]||{dr:0,cr:0,group:l.group}))}</td><td><button class=\"secondary\" onclick=\"editOpening('${esc(l.name)}')\">Opening</button></td></tr>`).join('')+'</table></div>';
+renderVoucherRegister();
+let tbData=trialBalanceRows(),td=tbData.dr,tc=tbData.cr;let tb=tbData.rows.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.group)}</td><td>${x.debit?money(x.debit):'—'}</td><td>${x.credit?money(x.credit):'—'}</td></tr>`).join('');
+document.getElementById('tbTable').innerHTML='<table><tr><th>Ledger</th><th>Group</th><th>Debit</th><th>Credit</th></tr>'+tb+'</table>';document.getElementById('tbTotals').innerHTML=`<b>Debit ${money(td)} • Credit ${money(tc)} • Difference ${money(tbData.diff)}</b> <span class="${tbData.diff<.01?'good':'bad'}">${tbData.diff<.01?'Balanced':'Check entries'}</span>`+(tbData.openingDiff>0.005?`<div class="notice bad"><b>Opening balance mismatch:</b> Opening Dr ${money(tbData.openingDr)} • Opening Cr ${money(tbData.openingCr)} • Difference ${money(tbData.openingDiff)}. Opening balances ko correct karein; app is difference ko zabardasti kisi ledger mein add nahi karega.</div>`:'')+(tbData.voucherIssues.length?`<div class="notice bad"><b>${tbData.voucherIssues.length} voucher(s) have unbalanced postings.</b><br>${tbData.voucherIssues.map(v=>esc(v.date)+' • '+esc(v.voucher)+' • '+esc(v.narration||'No narration')+' — Dr '+money(v.debit)+' / Cr '+money(v.credit)+' / Difference '+money(v.diff)).join('<br>')}</div>`:'');
+ const openingLedgers=co().ledgers.filter(l=>(Number(l.openingDr)||0)!==0||(Number(l.openingCr)||0)!==0);
+document.getElementById('tbAudit').innerHTML=(openingLedgers.length?'<div class="notice bad"><b>Opening balances found:</b><br>'+openingLedgers.map(l=>esc(l.name)+' — Dr '+money(l.openingDr||0)+' / Cr '+money(l.openingCr||0)+' <button class=\"danger\" onclick=\"clearLedgerOpening(\''+esc(l.name)+'\')\">Reset ₹0</button>').join('<br>')+'</div>':'')+(tbData.diff>0.005&&!tbData.voucherIssues.length?'<div class="notice bad"><b>Audit needed:</b> Voucher-level debit-credit postings balanced hain, lekin ledger net totals mein '+money(tbData.diff)+' ka difference hai. Opening Dr '+money(tbData.openingDr)+' / Opening Cr '+money(tbData.openingCr)+'. Ledger opening balances aur kisi legacy/malformed posting ko review karein. App automatic suspense entry nahi banayega.</div>':'');
+const rows=Object.entries(m).map(([name,x])=>({name,group:x.group,bal:net(x)}));
+let income=rows.filter(x=>groupClass(x.group)==='Income').reduce((a,x)=>a-x.bal,0),expense=rows.filter(x=>groupClass(x.group)==='Expense').reduce((a,x)=>a+x.bal,0),profit=income-expense;
+document.getElementById('plReport').innerHTML=`Income: <b>${money(income)}</b><br>Expenses: <b>${money(expense)}</b><hr>Net profit / (loss): <b>${money(profit)}</b>`;
+let assets=rows.filter(x=>groupClass(x.group)==='Asset').reduce((a,x)=>a+x.bal,0),liab=rows.filter(x=>groupClass(x.group)==='Liability').reduce((a,x)=>a-x.bal,0),capital=rows.filter(x=>groupClass(x.group)==='Capital').reduce((a,x)=>a-x.bal,0);
+document.getElementById('bsReport').innerHTML=`Assets: <b>${money(assets)}</b><br>Liabilities: <b>${money(liab)}</b><br>Capital: <b>${money(capital+profit)}</b><br><span class="muted">Basic demo view. Inventory valuation, statutory GST returns, e-invoice/e-way bill and year-end adjustments are not included.</span>`;
+}
+
+function quickVoucher(type){showPage('entry');document.getElementById('vType').value=type;document.getElementById('vDate').value=new Date().toISOString().slice(0,10);document.getElementById('vNarration').focus();}
+function renderVoucherRegister(){const box=document.getElementById('voucherTable');if(!box)return;const c=co(),type=document.getElementById('voucherFilter')?.value||'All',q=(document.getElementById('voucherSearch')?.value||'').toLowerCase();const list=[...c.entries].reverse().filter(e=>(type==='All'||e.voucher===type)&&[e.narration,e.debitLedger,e.creditLedger,e.billNo,e.partyName].join(' ').toLowerCase().includes(q));box.innerHTML=list.length?'<table><tr><th><input type="checkbox" aria-label="Select visible vouchers" onchange="selectAllVisibleVouchers(this.checked)"></th><th>Date / Type</th><th>Debit → Credit</th><th>Amount</th><th>Actions</th></tr>'+list.map(e=>`<tr><td><input class="voucherPick" type="checkbox" value="${esc(e.id)}"></td><td>${esc(e.date)}<br><span class="pill">${esc(e.voucher)}</span></td><td>${esc(e.debitLedger||'—')} → ${esc(e.creditLedger||'—')}<br><span class="muted">${esc(e.narration||e.billNo||'')}</span></td><td>${money(e.amount)}</td><td><div class="actions"><button class="secondary" onclick="editVoucher('${e.id}')">Edit</button><button class="secondary" onclick="printBill('${e.id}')">Print</button><button class="danger" onclick="deleteVoucher('${e.id}')">Delete</button></div></td></tr>`).join('')+'</table>':'<p class="muted">Is filter mein koi voucher nahi mila.</p>'; }
+function selectAllVisibleVouchers(on){document.querySelectorAll('#voucherTable .voucherPick').forEach(x=>x.checked=!!on)}
+function deleteSelectedVouchers(){const ids=[...document.querySelectorAll('#voucherTable .voucherPick:checked')].map(x=>x.value);if(!ids.length)return alert('Pehle voucher select karein.');if(!confirm('Selected '+ids.length+' vouchers aur unki accounting postings delete hongi. Pehle Backup lein. Continue?'))return;co().entries=co().entries.filter(e=>!ids.includes(e.id));saveDB();render();alert(ids.length+' selected vouchers delete ho gaye.')}
+function deleteAllCompanyVouchers(){const n=co().entries.length;if(!n)return alert('Is company mein koi voucher nahi hai.');if(!confirm('WARNING: '+co().name+' ke '+n+' ALL vouchers permanently delete honge. Company aur ledgers rahenge. Pehle Backup lein. Continue?'))return;if(!confirm('Final confirmation: poori voucher history delete karni hai?'))return;co().entries=[];saveDB();render();alert('Is company ke sabhi vouchers delete ho gaye. Company aur ledgers safe hain.')}
+
+
+function downloadBackup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='honey-tally-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function restoreBackup(){let f=document.getElementById('restoreFile').files[0];if(!f)return alert('Backup file select karein');let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.companies||!Array.isArray(x.companies))throw 0;db=x;if(!db.current)db.current=db.companies[0]?.id;saveDB();render();alert('Backup restored')}catch(e){alert('Invalid backup file')}};r.readAsText(f)}
+document.getElementById('vDate').value=new Date().toISOString().slice(0,10);
+setTimeout(()=>document.getElementById('splash').classList.add('hidden'),2600);
+let smartTimer;document.getElementById('smartText').addEventListener('input',()=>{clearTimeout(smartTimer);smartTimer=setTimeout(()=>{if(document.getElementById('smartText').value.trim())suggestEntry();else document.getElementById('suggestBox').innerHTML='';},600)});
+render();document.getElementById('billDate').value=new Date().toISOString().slice(0,10);addBillRow();
+document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;const map={F4:'Contra',F5:'Payment',F6:'Receipt',F7:'Journal',F8:'Sales',F9:'Purchase'};if(map[e.key]){e.preventDefault();quickVoucher(map[e.key]);}});
+</script>
+</body></html>
